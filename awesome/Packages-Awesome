@@ -1,0 +1,104 @@
+## Xorg Packages
+inxi
+libdnet
+mesa
+mesa-demos
+>x86_64 lib32-mesa-demos
+netkit-bsd-finger
+uriparser
+xf86-input-acecad
+xf86-input-aiptek
+xf86-input-evdev
+xf86-input-joystick
+xf86-input-keyboard
+xf86-input-mouse
+xf86-input-synaptics
+xf86-input-void
+xf86-input-wacom
+xinetd
+xorg-server
+xorg-server-utils
+xorg-twm
+xorg-utils
+xorg-xinit
+
+## Packages for Sound and Audio
+manjaro-alsa
+
+## Artwork
+manjaro-artwork
+adwaita-manjaro-themes
+
+## Base Packages
+awesome
+vicious
+oblogout
+slim
+dmenu-xft-height # Local repo (AUR)
+unagi # Local repo (AUR)
+volnoti-git # Local repo (Github)
+archlinux-xdg-menu # Local repo (Arch repos)
+zsh
+fontconfig-infinality-ultimate
+freetype2-infinality-ultimate
+cairo-infinality-ultimate
+>x86_64 lib32-freetype2-infinality-ultimate
+postinstall # Local repo (Own package)
+faenza-blue-dark # Local repo (Gnome-Look)
+conky
+network-manager-applet
+clipit
+volumeicon
+
+## Applications
+thunar
+thunar-archive-plugin
+thunar-media-tags-plugin
+file-roller
+gvfs
+tumbler
+rxvt-unicode
+scrot
+mpv
+htop
+galculator
+dwb
+midori
+zathura-pdf-poppler
+leafpad
+gvim
+feh
+weechat
+mutt
+newsbeuter
+cmus
+transmission-gtk
+ranger
+audacious
+
+## Multimedia
+gst-libav
+gst-plugins-bad
+gst-plugins-base
+gst-plugins-good
+gst-plugins-ugly
+gstreamer0.10-bad-plugins
+gstreamer0.10-base-plugins
+gstreamer0.10-good-plugins
+gstreamer0.10-ugly-plugins
+flashplugin
+libdvdcss
+
+## AUR Access
+autoconf
+automake
+binutils
+bison
+fakeroot
+flex
+gcc
+libtool
+m4
+make
+patch
+yaourt

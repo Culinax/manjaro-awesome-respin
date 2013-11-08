@@ -1,0 +1,71 @@
+# Conky theme put together by Culinax
+# Part of the Manjaro Awesome WM Respin
+
+own_window yes
+own_window_type desktop
+own_window_hints below,skip_taskbar,skip_pager
+own_window_colour 000000
+own_window_argb_visual yes
+own_window_argb_value 200
+alignment top_right
+gap_x 18
+gap_y 36
+use_xft yes
+xftfont Terminus:size=9
+uppercase no
+update_interval 2
+total_run_times 0
+double_buffer yes
+no_buffers yes
+draw_shades no
+draw_outline no
+draw_borders no
+minimum_size 200 200
+maximum_width 250
+
+TEXT
+${color #447799}CLOCK${hr}
+${color #9eb1ba}${time %d %B %Y}${alignr}${color #ffffff}${font Terminus:size=12}${time %H:%M}${font}  
+
+${color #447799}MANJAROLINUX${hr}
+${color #9eb1ba}Host:${alignr}${color #ffffff}${nodename}
+${color #9eb1ba}Kernel:${alignr}${color #ffffff}${kernel}
+${color #9eb1ba}Uptime:${alignr}${color #ffffff}${uptime}
+${color #9eb1ba}CPU:${alignr}${color #ffffff}${cpu cpu0}%
+${color #9eb1ba}RAM:${alignr}${color #ffffff}${mem} / ${memmax}
+
+${color #447799}PROCESSES${hr}
+${color #9eb1ba}${top_mem name 1}${alignr}${color #ffffff}${top_mem mem 1}
+${color #9eb1ba}${top_mem name 2}${alignr}${color #ffffff}${top_mem mem 2}
+${color #9eb1ba}${top_mem name 3}${alignr}${color #ffffff}${top_mem mem 3}
+${color #9eb1ba}${top_mem name 4}${alignr}${color #ffffff}${top_mem mem 4}
+
+${color #447799}KEYBINDINGS${hr}
+${color #9eb1ba}Mod4+p${color #ffffff}${alignr}Dmenu
+${color #9eb1ba}Mod4+Return${color #ffffff}${alignr}Terminal
+${color #9eb1ba}Mod4+d${color #ffffff}${alignr}Dwb
+${color #9eb1ba}Mod4+t${color #ffffff}${alignr}Thunar
+
+${color #9eb1ba}Mod4+j${color #ffffff}${alignr}Focus Next
+${color #9eb1ba}Mod4+k${color #ffffff}${alignr}Focus Previous
+${color #9eb1ba}Mod4+Shift+c${color #ffffff}${alignr}Kill Client
+${color #9eb1ba}Mod4+[1-9]${color #ffffff}${alignr}View tag \#
+${color #9eb1ba}Mod4+Shift+[1-9]${color #ffffff}${alignr}Move to tag \#
+${color #9eb1ba}Mod4+h${color #ffffff}${alignr}Decrease Master
+${color #9eb1ba}Mod4+l${color #ffffff}${alignr}Increase Master
+${color #9eb1ba}Mod4+w${color #ffffff}${alignr}Open menu
+${color #9eb1ba}Mod4+F10${color #ffffff}${alignr}Toggle Conky
+${color #9eb1ba}Mod4+f${color #ffffff}${alignr}Set client fullscreen
+
+${color #9eb1ba}Mod4+Space${color #ffffff}${alignr}Cycle Layouts
+${color #9eb1ba}Mod4+Ctrl+t${color #ffffff}${alignr}Tiling mode
+${color #9eb1ba}Mod4+Ctrl+b${color #ffffff}${alignr}Bottom Stack
+${color #9eb1ba}Mod4+Ctrl+s${color #ffffff}${alignr}Fair
+${color #9eb1ba}Mod4+Ctrl+m${color #ffffff}${alignr}Maximized
+${color #9eb1ba}Mod4+Ctrl+f${color #ffffff}${alignr}Floating mode
+
+${color #9eb1ba}Mod4+Shift+l${color #ffffff}${alignr}Lock Screen
+${color #9eb1ba}Mod4+Control+r${color #ffffff}${alignr}Restart
+${color #9eb1ba}Mod4+Shift+q${color #ffffff}${alignr}Logout
+
+

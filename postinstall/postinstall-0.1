@@ -1,0 +1,1582 @@
+#!/bin/bash
+#
+# postinstall-0.1  -  Post Installation Script
+#
+# Post Installation Script is a script which is developed for Manjaro awesome WM
+# respin, codenamed: Cesious. It's purpose is to provide an easy way for users
+# to set up their system, get used to the keybindings and download and install
+# applications.
+#
+# Written by Culinax
+
+PS3="> "
+normal=$(tput sgr0)
+bold=$(tput bold)
+blue='\e[0;34m'
+title="$blue""$bold"
+
+print_title() {
+    printf "${title}Post Installation Script$@${normal}\n"
+}
+
+print_main() {
+    echo "
+Welcome to Manjaro awesome WM Respin, codenamed: Cesious!
+
+The purpose of this Post Installation Script is to automate common tasks which
+should help you to get you started using your brand new installation.
+
+It is by no means mandatory to run this script, however it is recommended to go
+throught this script once, as it is a very helpful addition. It is recommended
+to start from the first step and then work your way down.
+"
+}
+
+print_cats() {
+    opts=("Quick awesome WM starting guide (description + mous/keybindings)"\
+          "Manjaro specific keybindings"\
+          "Rank mirrorlist, sync to the repositories and update the system"\
+          "Install applications sorted by category"\
+          "Never display at boot again"\
+          "Quit")
+    idx=1
+    for i in "${opts[@]}"; do
+        if [[ ${i:0:5} = "Never" ]]; then
+            echo "r. $i"
+        elif [[ ${i:0:4} = "Quit" ]]; then
+            echo "q. $i"
+        else
+            echo "${idx}. $i"
+        fi
+        (( idx++ ))
+    done
+    echo
+}
+
+starthere() {
+    clear
+    print_title
+    print_main
+    echo "\
+It is necessary for this script that an internet conncetion is available. Please
+make sure that you have a working connection before you continue. Press [Return]
+to perform a connection check.
+"
+    installedcheck
+    while true; do
+        read -s -n 1 -p "> " input
+        if [[ $input = "" ]]; then
+            if ping -q -w 1 -c 1 8.8.8.8 &> /dev/null; then
+                echo "Connection check succeeded..."
+                sleep 1
+                main
+            else
+                echo "Connection check failed... Please connect to the internet and press [Return] to
+  run a connection check again"
+                continue
+            fi
+        else
+            echo "Press [Return] to run a connection check"
+            continue
+        fi
+    done
+}
+
+main() {
+    while true; do
+        clear
+        print_title
+        print_main
+        print_cats
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                1)  man awesome
+                    clear
+                    break
+                    ;;
+                2)  clear
+                    documentation | less
+                    clear
+                    break
+                    ;;
+                3)  clear
+                    ranksyncupdate
+                    clear
+                    break
+                    ;;
+                4)  clear
+                    installapps
+                    clear
+                    break
+                    ;;
+                r)  removefromstartup
+                    ;;
+                q)  quit
+                    ;;
+                *)  echo "Invalid Option"
+                    continue
+                    ;;
+            esac
+        done
+    done
+}
+
+
+
+################################################################################
+################################### OPTION 2 ###################################
+################################################################################
+
+
+
+#TODO# Write a quick user guide with keybindings + a more lengthy one for people who want to take the most out of their WM, describing configuration options etc. #TODO#
+documentation() {
+cat <<EOF
+List of added (non-default) keybindings. For default keybindings you can read the manpage of awesome.
+
+Basic keys
+    Mod4 + Shift + q
+        OBLogout
+    Mod4 + p
+        dmenu
+    Mod4 + b
+        Toggle wibox visibilaty
+    Mod4 + Shift + l
+        Lock the screen (slock)
+    Mod4 + F10
+        Toggle Conky HUD
+
+Applications
+    Mod4 + d
+        dwb (web browser)
+    Mod4 + t
+        Thunar (file manager)
+
+Switch to specific layout (compared to Mod4 + Space which iterates over all of them)
+    Mod4 + Control + f
+        Floating Mode
+    Mod4 + Control + t
+        Tiling Mode
+    Mod4 + Control + b
+        Bottom Stack
+    Mod4 + Control + s
+        Fair
+    Mod4 + Control + m
+        Maximized
+
+Volume Control
+    XF86AudioRaiseVolume
+        Raise volume (ALSA) while spawning Volnoti to show the current volume
+    XF86AudioLowerVolume
+        Lower volume (ALSA) while spawning Volnoti to show the current volume
+    XF86AudioMute
+        Toggle mute (ALSA) while spawning Volnoti to show the current volume
+
+Brightness Control
+    XF86MonBrightnessUp
+        Raise brightnesss while spawning Volnoti to show the current brightness
+    XF86MonBrightnessDown
+        Lower brightness while spawning Volnoti to show the current brightness
+
+PrintScreen
+    Print
+        Take a screenshot of the whole screen (scrot)
+    Shift + Print
+        Take a screenshot of a windows (scrot)
+EOF
+}
+
+
+
+################################################################################
+################################### OPTION 3 ###################################
+################################################################################
+
+
+
+#TODO# Maybe break the function when a command fails? #TODO#
+ranksyncupdate(){
+    print_title " > Rank Sync Update"
+    echo
+
+    sudo pacman-key --init
+    sudo pacman-key --populate archlinux manjaro
+    if grep -q "Post Installation Script" /etc/pacman.conf; then
+        if sudo sed -i '/Post Installation Script/d' /etc/pacman.conf; then
+            sudo pacman-key -r 962DDE58
+            sudo pacman-key --lsign-key 962DDE58
+        fi
+    fi
+    sudo pacman-mirrors -g
+    sudo pacman -Syy manjaro-system pacman --needed 2>/dev/null
+    if sudo pacman -Su; then
+        while true; do
+            printf '%b\n' "\nInstallation finished successfully. Press [Return] to finish.\n"
+            while true; do
+                read -s -n 1 -p "> " input
+                if [[ $input = "" ]]; then
+                    break
+                else
+                    echo "Press [Return] to finish"
+                    continue
+                fi
+            done
+            break
+        done
+
+    else
+        while true; do
+            printf '%b\n' "\nIt seems like an error occured. Please analyze the output carefully to solve the problem. Press [Return] to finish.\n"
+            while true; do
+                read -s -n 1 -p "> " input
+                if [[ $input = "" ]]; then
+                    break
+                else
+                    echo "Press [Return] to finish"
+                    continue
+                fi
+            done
+            break
+        done
+
+    fi
+}
+
+
+
+################################################################################
+################################### OPTION 4 ###################################
+################################################################################
+
+
+
+declare -A applist installedlist
+
+installedcheck() {
+    for app in "${calapps[@]}" "${cddvdapps[@]}" "${chatapps[@]}" "${emailapps[@]}"\
+        "${graphicapps[@]}" "${imgviewapps[@]}" "${ircapps[@]}" "${fileapps[@]}"\
+        "${thunarapps[@]}" "${pcmanfmapps[@]}" "${nautilusapps[@]}" "${musicapps[@]}"\
+        "${mpdapps[@]}" "${officeapps[@]}" "${pdfapps[@]}" "${rssapps[@]}" "${sysmonapps[@]}"\
+        "${termapps[@]}" "${textapps[@]}" "${torrentapps[@]}" "${utilapps[@]}"\
+        "${videoapps[@]}" "${webapps[@]}"; do
+        if pacman -Qq ${app,,} &>/dev/null; then
+            applist[$app]=
+            installedlist[$app]=
+        fi
+    done
+}
+
+contains_app() {
+    local i
+    for i in "${@:2}"; do
+        [[ $i = $1 ]] && return 0
+    done
+    return 1
+}
+
+installapps() {
+    cal_cat
+    cddvd_cat
+    chat_cat
+    email_cat
+    graphic_cat
+    imgview_cat
+    irc_cat
+    file_cat
+    music_cat
+    office_cat
+    pdf_cat
+    rss_cat
+    sysmon_cat
+    term_cat
+    text_cat
+    torrent_cat
+    util_cat
+    video_cat
+    web_cat
+
+    list_install
+    list_remove
+    (( skip_install != 1 )) && install_apps
+    (( skip_remove != 1 )) && remove_apps
+}
+
+list_install() {
+#TODO# Make a more extensive menu similar to the categories where you can enable/disable | If possible #TODO#
+    if (( ${#applist[@]} != 0 )); then
+        while true; do
+            applistbak=("${!applist[@]}")
+            print_title " > Install Applications > Review Installation List\n"
+            printf '%b\n' "This is a list of applications that you have listed for installation. You can\nreview them here, in case you changed your mind and don't want an application\nanyway. Select the correct number to remove a selection from the installation\nlist.\n\n0.   Proceed to next step\n"
+            select opt in "${!applist[@]}"; do
+                case "$REPLY" in
+                    0)  quitcat=1; clear; break
+                        ;;
+#TODO# [1-"${#applistbak[@]}"]) seems to stop at 7 even though there are higher numbers #TODO#
+                    *)  opt=${applistbak[$REPLY-1]}
+                        (( REPLY > ${#applistbak[@]} )) && echo "Invalid Option" && continue
+                        if contains_app "$opt" "${!applist[@]}"; then
+                            unset applist[$opt]
+                        else
+                            applist[$opt]=
+                        fi
+                        clear
+                        break
+                        ;;
+                esac
+            done
+            (( quitcat == 1 )) && quitcat=0 && break
+        done
+
+    else
+        print_title " > Install Applications > Review Installation List\n"
+        printf '%b\n' "No applications are listed for installation. Press [0] to proceed.\n"
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  clear; break
+                    ;;
+                *)  echo "Press [0] to proceed"
+                    ;;
+            esac
+        done
+
+    fi
+
+    installlist=()
+    for app in "${!applist[@]}"; do
+        if ! contains_app "$app" "${!installedlist[@]}"; then
+            installlist+=("$app")
+        fi
+    done
+        
+    (( ${#installlist[@]} == 0 )) && skip_install=1
+}
+
+list_remove() {
+    declare -A remlist
+    for app in "${!installedlist[@]}"; do 
+        if ! contains_app "$app" "${!applist[@]}"; then
+            remlist[$app]=
+        fi
+    done
+
+#TODO# Make a more extensive menu similar to the categories where you can enable/disable | If possible #TODO#
+    if (( ${#remlist[@]} != 0 )); then
+        while true; do
+            remlistbak=("${!remlist[@]}")
+            print_title " > Install Applications > Review Removal List\n"
+            printf '%b\n' "This is a list of applications that you have listed for removal. You can\nreview them here, in case you changed your mind and don't want to remove an\napplication anyway. Select the correct number to remove a selection from the\nremoval list.\n\n0.   Proceed to next step\n"
+            select opt in "${!remlist[@]}"; do
+                case "$REPLY" in
+                    0)  quitcat=1; clear; break
+                        ;;
+#TODO# [1-"${#applistbak[@]}"]) seems to stop at 7 even though there are higher numbers #TODO#
+                    *)  opt=${remlistbak[$REPLY-1]}
+                        (( REPLY > ${#remlistbak[@]} )) && echo "Invalid Option" && continue
+                        if contains_app "$opt" "${!remlist[@]}"; then
+                            unset remlist[$opt]
+                        else
+                            remlist[$opt]=
+                        fi
+                        clear
+                        break
+                        ;;
+                esac
+            done
+            (( quitcat == 1 )) && quitcat=0 && break
+        done
+
+    else
+        print_title " > Install Applications > Review Removal List\n"
+        printf '%b\n' "No applications are listed for removal. Press [0] to proceed.\n"
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  clear; break
+                    ;;
+                *)  echo "Press [0] to proceed"
+                    ;;
+            esac
+        done
+    fi
+
+    removelist=()
+    for app in "${!remlist[@]}"; do
+        removelist+=($app)
+    done
+    (( ${#removelist[@]} == 0 )) && skip_remove=1
+}
+
+install_apps() {
+    clear
+    print_title " > Install Applications > Install Applications\n"
+    if sudo pacman -S "${installlist[@],,}"; then
+        printf '%b\n' "\nInstallation finished successfully. Press [Return] to finish.\n"
+        while true; do
+            read -s -n 1 -p "> " input
+            if [[ $input = "" ]]; then
+                break
+            else
+                echo "Press [Return] to finish."
+            fi
+        done
+        for app in "${installlist[@]}"; do
+            installedlist[$app]=
+        done
+    
+    else
+        printf '%b\n' "\nIt seems like an error occured during the installation. Please analyze the output carefully to solve the\nproblem. Press [Return] to finish.\n"
+        while true; do
+            read -s -n 1 -p "> " input
+            if [[ $input = "" ]]; then
+                break
+            else
+                echo "Press [Return] to finish."
+            fi
+        done
+    fi
+}
+
+remove_apps() {
+    clear
+    print_title " > Install Applications > Remove Applications\n"
+    if sudo pacman -Rns "${removelist[@],,}"; then
+        printf '%b\n' "\nRemoval finished successfully. Press [Return] to finish.\n"
+        while true; do
+            read -s -n 1 -p "> " input
+            if [[ $input = "" ]]; then
+                break
+            else
+                echo "Press [Return] to finish."
+            fi
+        done
+        for app in "${removelist[@]}"; do
+            unset installedlist[$app]
+        done
+    
+    else
+        printf '%b\n' "\nIt seems like an error occured during the removal. Please analyze the output\ncarefully to solve the problem. Press [Return] to finish.\n"
+        while true; do
+            read -s -n 1 -p "> " input
+            if [[ $input = "" ]]; then
+                break
+            else
+                echo "Press [Return] to finish."
+            fi
+        done
+    fi
+
+    unset remlist
+}
+
+declare -A caldesc=(\
+    ["calcurse"]="A text-based personal organizer." \
+    ["Wyrd"]="A text-based front-end to Remind.")
+declare -A cddvddesc=(\
+    ["Brasero"]="A disc burning application for Gnome" \
+    ["K3b"]="Feature-rich and easy to handle CD burning application" \
+    ["Xfburn"]="A simple CD/DVD burning tool based on libburnia libraries")
+declare -A chatdesc=(\
+    ["BitlBee"]="Brings instant messaging (XMPP, MSN, Yahoo!, AIM, ICQ, Twitter) to IRC" \
+    ["Pidgin"]="Multi-protocol instant messaging client" \
+    ["Skype"]="P2P software for high-quality voice communication")
+declare -A emaildesc=(\
+    ["Evolution"]="Manage your email, contacts and schedule" \
+    ["Mutt"]="Small but very powerful text-based mail client" \
+    ["Thunderbird"]="Standalone Mail/News reader")
+declare -A graphicdesc=(\
+    ["Blender"]="A fully integrated 3D graphics creation suite" \
+    ["GIMP"]="GNU Image Manipulation Program" \
+    ["ImageMagick"]="An image viewing/manipulation program" \
+    ["Inkscape"]="Vector graphics editor using the SVG file format" \
+    ["Pinta"]="A drawing/editing program modeled after Paint.NET.")
+declare -A imgviewdesc=(\
+    ["feh"]="Fast and light imlib2-based image viewer" \
+    ["GPicView"]="lightweight image viewer" \
+    ["Mirage"]="A simple GTK+ Image Viewer" \
+    ["Viewnior"]="A simple, fast and elegant image viewer program")
+declare -A ircdesc=(\
+    ["HexChat"]="A popular and easy to use graphical IRC (chat) client" \
+    ["Irssi"]="Modular text mode IRC client with Perl scripting" \
+    ["WeeChat"]="Fast, light and extensible IRC client (curses UI)")
+declare -A filedesc=(\
+    ["kdebase-Dolphin"]="File Manager" \
+    ["MC"]="Midnight Commander is a text based filemanager/shell that emulates Norton Commander" \
+    ["Nautilus"]="GNOME file manager" \
+    ["PCManFM"]="An extremely fast and lightweight file manager" \
+    ["ranger"]="A simple, vim-like file manager" \
+    ["SpaceFM"]="Multi-panel tabbed file manager" \
+    ["Thunar"]="Modern file manager for Xfce")
+declare -A thunardesc=(\
+    ["GVfs"]="For trash support, mounting with udisk and remote filesystems" \
+    ["Thunar-Archive-Plugin"]="Create and deflate archives" \
+    ["Thunar-Media-Tags-Plugin"]="View/edit id3/ogg tags" \
+    ["Thunar-VolMan"]="Manages removable devices" \
+    ["Tumbler"]="For thumbnail previews")
+declare -A pcmanfmdesc=(\
+    ["GVfs"]="For trash support, mounting with udisk and remote filesystems")
+declare -A nautilusdesc=(\
+    ["Nautilus-Actions"]="Configures programs to be launched when files are selected in Nautilus" \
+    ["Nautilus-Terminal"]="An integrated terminal for Nautilus" \
+    ["Nautilus-Open-Terminal"]="A nautilus plugin for opening terminals in arbitrary local paths" \
+    ["Seahorse-Nautilus"]="PGP encryption and signing for nautilus")
+declare -A musicdesc=(\
+    ["Amarok"]="The powerful music player for KDE" \
+    ["Audacious"]="Lightweight, advanced audio player focused on audio quality" \
+    ["Banshee"]="music management and playback for GNOME" \
+    ["Clementine"]="A music player and library organizer" \
+    ["cmus"]="Very feature-rich ncurses-based music player" \
+    ["DeaDBeeF"]="An audio player for GNU/Linux based on GTK2." \
+    ["MOC"]="An ncurses console audio player designed to be powerful and easy to use" \
+    ["MPD"]="Flexible, powerful, server-side application for playing music" \
+    ["Rhythmbox"]="An iTunes-like music playback and management application")
+declare -A mpddesc=(\
+    ["mpc"]="Minimalist command line interface to MPD" \
+    ["ncmpcpp"]="Almost exact clone of ncmpc with some new features")
+declare -A officedesc=(\
+    ["AbiWord"]="A fully-featured word processor" \
+    ["Calligra"]="Actively developed fork of KOffice, the KDE office suite" \
+    ["Gnumeric"]="A GNOME Spreadsheet Program" \
+    ["LibreOffice"]="A productivity suite that is compatible with other major office suites")
+declare -A pdfdesc=(\
+    ["ePDFView"]="A free lightweight PDF document viewer." \
+    ["Evince"]="Simply a document viewer" \
+    ["MuPDF"]="Lightweight PDF and XPS viewer" \
+    ["Xpdf"]="Viewer for Portable Document Format (PDF) files" \
+    ["zathura-pdf-mupdf"]="Adds pdf support to zathura by using the mupdf library" \
+    ["zathura-pdf-poppler"]="Adds pdf support to zathura by using the poppler engine")
+declare -A rssdesc=(\
+    ["Liferea"]="A desktop news aggregator for online news feeds and weblogs" \
+    ["newsbeuter"]="A RSS feed reader for the text console with special Podcast support")
+declare -A sysmondesc=(\
+    ["Conky"]="Lightweight system monitor for X" \
+    ["htop"]="Interactive process viewer")
+declare -A termdesc=(\
+    ["GNOME-Terminal"]="The GNOME Terminal Emulator" \
+    ["kdebase-Konsole"]="Terminal" \
+    ["LXTerminal"]="VTE-based terminal emulator (part of LXDE)" \
+    ["rxvt-unicode"]="An unicode enabled rxvt-clone terminal emulator (urxvt)" \
+    ["sakura"]="A terminal emulator based on GTK and VTE" \
+    ["Terminator"]="Terminal emulator that supports tabs and grids" \
+    ["Xfce4-Terminal"]="A modern terminal emulator primarly for the Xfce desktop environment" \
+    ["xterm"]="X Terminal Emulator")
+declare -A textdesc=(\
+    ["Emacs"]="The extensible, customizable, self-documenting real-time display editor" \
+    ["Geany"]="Fast and lightweight IDE" \
+    ["gedit"]="A text editor for GNOME" \
+    ["gVim"]="Vi Improved (with features, such as a GUI)" \
+    ["Leafpad"]="A notepad clone for GTK+ 2.0" \
+    ["Vim"]="Vi Improved, a highly configurable, improved version of the vi text editor")
+declare -A torrentdesc=(\
+    ["Deluge"]="A BitTorrent client with multiple use interfaces in a client/server model" \
+    ["rTorrent"]="Ncurses BitTorrent client based on libTorrent" \
+    ["Transmission-CLI"]="Fast, easy, and free BitTorrent client (CLI tools, daemon and web client)" \
+    ["Transmission-GTK"]="Fast, easy, and free BitTorrent client (GTK+ GUI)" \
+    ["Transmission-Remote-CLI"]="Curses interface for the daemon of the BitTorrent client Transmission" \
+    ["Transmission-Qt"]="Fast, easy, and free BitTorrent client (Qt GUI)")
+declare -A utildesc=(\
+    ["BleachBit"]="Deletes unneeded files to free disk space and maintain privacy" \
+    ["ClipIt"]="Lightweight GTK+ clipboard manager (fork of Parcellite)" \
+    ["galculator"]="GTK+ based scientific calculator" \
+    ["Parcellite"]="Lightweight GTK+ clipboard manager" \
+    ["scrot"]="A simple command-line screenshot utility for X" \
+    ["tmux"]="A terminal multiplexer")
+declare -A videodesc=(\
+    ["GNOME-MPlayer"]="A simple MPlayer GUI" \
+    ["MPlayer"]="A movie player for Linux" \
+    ["mpv"]="Video player based on MPlayer/mplayer2" \
+    ["SMPlayer"]="A complete front-end for MPlayer" \
+    ["VLC"]="A multi-platform MPEG, VCD/DVD, and DivX player")
+declare -A webdesc=(\
+    ["Chromium"]="The open-source project behind Google Chrome, an attempt at creating a safer, faster, and more stable browser" \
+    ["dwb"]="A webkit web browser with vi-like keyboard shortcuts, stable snapshot" \
+    ["Firefox"]="Standalone web browser from mozilla.org" \
+    ["luakit"]="Fast, small, webkit based browser framework extensible by Lua" \
+    ["Midori"]="Lightweight web browser based on Gtk WebKit" \
+    ["Opera"]="Fast and secure web browser and Internet suite" \
+    ["Uzbl-Tabbed"]="Tabbing manager providing multiple uzbl-browser instances in 1 window")
+
+calapps=("${!caldesc[@]}")
+cddvdapps=("${!cddvddesc[@]}")
+chatapps=("${!chatdesc[@]}")
+emailapps=("${!emaildesc[@]}")
+graphicapps=("${!graphicdesc[@]}")
+imgviewapps=("${!imgviewdesc[@]}")
+ircapps=("${!ircdesc[@]}")
+fileapps=("${!filedesc[@]}")
+thunarapps=("${!thunardesc[@]}")
+pcmanfmapps=("${!pcmanfmdesc[@]}")
+nautilusapps=("${!nautilusdesc[@]}")
+musicapps=("${!musicdesc[@]}")
+mpdapps=("${!mpddesc[@]}")
+officeapps=("${!officedesc[@]}")
+pdfapps=("${!pdfdesc[@]}")
+rssapps=("${!rssdesc[@]}")
+sysmonapps=("${!sysmondesc[@]}")
+termapps=("${!termdesc[@]}")
+textapps=("${!textdesc[@]}")
+torrentapps=("${!torrentdesc[@]}")
+utilapps=("${!utildesc[@]}")
+videoapps=("${!videodesc[@]}")
+webapps=("${!webdesc[@]}")
+
+cal_cat() {
+    while true; do
+        print_title " > Install Applications > Calendars\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${calapps[@]}"; do
+            desc="${caldesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-9s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-9s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#calapps[@]}])
+                    opt=${calapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+cddvd_cat() {
+    while true; do
+        print_title " > Install Applications > CD/DVD Burners\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${cddvdapps[@]}"; do
+            desc="${cddvddesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-8s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-8s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#cddvdapps[@]}])
+                    opt=${cddvdapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+chat_cat() {
+    while true; do
+        print_title " > Install Applications > Chat Clients\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${chatapps[@]}"; do
+            desc="${chatdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-8s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-8s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#chatapps[@]}])
+                    opt=${chatapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+email_cat() {
+    while true; do
+        print_title " > Install Applications > Email Clients\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${emailapps[@]}"; do
+            desc="${emaildesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-12s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-12s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#emailapps[@]}])
+                    opt=${emailapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+graphic_cat() {
+    while true; do
+        print_title " > Install Applications > Graphic Manipulation\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${graphicapps[@]}"; do
+            desc="${graphicdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-12s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-12s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#graphicapps[@]}])
+                    opt=${graphicapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+imgview_cat() {
+    while true; do
+        print_title " > Install Applications > Image Viewers\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${imgviewapps[@]}"; do
+            desc="${imgviewdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-9s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-9s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#imgviewapps[@]}])
+                    opt=${imgviewapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+irc_cat() {
+    while true; do
+        print_title " > Install Applications > IRC Clients\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${ircapps[@]}"; do
+            desc="${ircdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-8s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-8s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#ircapps[@]}])
+                    opt=${ircapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+file_cat() {
+    while true; do
+        print_title " > Install Applications > File Managers\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${fileapps[@]}"; do
+            desc="${filedesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-16s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-16s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#fileapps[@]}])
+                    clear
+                    opt=${fileapps[$REPLY-1]}
+#TODO# GVfs is common between Thunar and PCManFM, but when e.g. PCManFM is removed and Thunar is not, GVfs is removed anyway. #TODO#
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                        if [[ $opt = "Thunar" ]]; then
+                            for app in "${thunarapps[@]}"; do
+                                if contains_app "$app" "${!applist[@]}"; then
+                                    unset applist[$app]
+                                fi
+                            done
+                        elif [[ $opt = "PCManFM" ]]; then
+                            for app in "${pcmanfmapps[@]}"; do
+                                if contains_app "$app" "${!applist[@]}"; then
+                                    unset applist[$app]
+                                fi
+                            done
+                        elif [[ $opt = "Nautilus" ]]; then
+                            for app in "${nautilusapps[@]}"; do
+                                if contains_app "$app" "${!applist[@]}"; then
+                                    unset applist[$app]
+                                fi
+                            done
+                        fi
+                    else
+                        applist[$opt]=
+                        if [[ $opt = "Thunar" ]]; then
+                            thunar_cat
+                        elif [[ $opt = "PCManFM" ]]; then
+                            pcmanfm_cat
+                        elif [[ $opt = "Nautilus" ]]; then
+                            nautilus_cat
+                        fi
+                    fi
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+thunar_cat() {
+    while true; do
+        print_title " > Install Applications > File Managers > Thunar\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${thunarapps[@]}"; do
+            desc="${thunardesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-25s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-25s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#thunarapps[@]}])
+                    opt=${thunarapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+pcmanfm_cat() {
+    while true; do
+        print_title " > Install Applications > File Managers > PCManFM\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${pcmanfmapps[@]}"; do
+            desc="${pcmanfmdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-5s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-5s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#pcmanfmapps[@]}])
+                    opt=${pcmanfmapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+nautilus_cat() {
+    while true; do
+        print_title " > Install Applications > File Managers > Nautilus\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${nautilusapps[@]}"; do
+            desc="${nautilusdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-23s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-23s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#nautilusapps[@]}])
+                    opt=${nautilusapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat = 1 )) && quitcat=0 && break
+    done
+}
+
+music_cat() {
+    while true; do
+        print_title " > Install Applications > Music Players\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${musicapps[@]}"; do
+            desc="${musicdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-11s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-11s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#musicapps[@]}])
+                    clear
+                    opt=${musicapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                        if [[ $opt = "MPD" ]]; then
+                            for app in "${mpdapps[@]}"; do
+                                if contains_app "$app" "${!applist[@]}"; then
+                                    unset applist[$app]
+                                fi
+                            done
+                        fi
+                    else
+                        applist[$opt]=
+                        if [[ $opt = "MPD" ]]; then
+                            mpd_cat
+                        fi
+                    fi
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat = 1 )) && quitcat=0 && break
+    done
+}
+
+mpd_cat() {
+    while true; do
+        print_title " > Install Applications > Music Players > MPD Clients\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${mpdapps[@]}"; do
+            desc="${mpddesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-8s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-8s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#mpdapps[@]}])
+                    opt=${mpdapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat = 1 )) && quitcat=0 && break
+    done
+}
+
+office_cat() {
+    while true; do
+        print_title " > Install Applications > Office Apps\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${officeapps[@]}"; do
+            desc="${officedesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-12s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-12s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#officeapps[@]}])
+                    opt=${officeapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat = 1 )) && quitcat=0 && break
+    done
+}
+
+pdf_cat() {
+    while true; do
+        print_title " > Install Applications > PDF Readers\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${pdfapps[@]}"; do
+            desc="${pdfdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-20s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-20s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#pdfapps[@]}])
+                    opt=${pdfapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat = 1 )) && quitcat=0 && break
+    done
+}
+
+rss_cat() {
+    while true; do
+        print_title " > Install Applications > RSS Readers\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${rssapps[@]}"; do
+            desc="${rssdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-11s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-11s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#rssapps[@]}])
+                    opt=${rssapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat = 1 )) && quitcat=0 && break
+    done
+}
+
+sysmon_cat() {
+    while true; do
+        print_title " > Install Applications > System Monitors\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${sysmonapps[@]}"; do
+            desc="${sysmondesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-6s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-6s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#sysmonapps[@]}])
+                    opt=${sysmonapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+term_cat() {
+    while true; do
+        print_title " > Install Applications > Terminal Emulators\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${termapps[@]}"; do
+            desc="${termdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-16s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-16s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#termapps[@]}])
+                    opt=${termapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+text_cat() {
+    while true; do
+        print_title " > Install Applications > Text Editors\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${textapps[@]}"; do
+            desc="${textdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-8s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-8s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#textapps[@]}])
+                    opt=${textapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+torrent_cat() {
+    while true; do
+        print_title " > Install Applications > Torrent Clients\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${torrentapps[@]}"; do
+            desc="${torrentdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-24s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-24s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#torrentapps[@]}])
+                    opt=${torrentapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+util_cat() {
+    while true; do
+        print_title " > Install Applications > Utilities\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${utilapps[@]}"; do
+            desc="${utildesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-11s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-11s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#utilapps[@]}])
+                    opt=${utilapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+video_cat() {
+    while true; do
+        print_title " > Install Applications > Video Players\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${videoapps[@]}"; do
+            desc="${videodesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-14s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-14s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#videoapps[@]}])
+                    opt=${videoapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+web_cat() {
+    while true; do
+        print_title " > Install Applications > Web Browsers\n"
+        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
+        idx=1
+        for app in "${webapps[@]}"; do
+            desc="${webdesc["$app"]}"
+            if contains_app "$app" "${!applist[@]}"; then
+                echo "${idx}. * $(printf "%-12s│" "$app") ${desc}"
+            else
+                echo "${idx}.   $(printf "%-12s│" "$app") ${desc}"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                0)  quitcat=1; clear; break
+                    ;;
+                [1-${#webapps[@]}])
+                    opt=${webapps[$REPLY-1]}
+                    if contains_app "$opt" "${!applist[@]}"; then
+                        unset applist[$opt]
+                    else
+                        applist[$opt]=
+                    fi
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+
+
+################################################################################
+################################### OPTION R ###################################
+################################################################################
+
+
+
+removefromstartup(){
+    if grep -q "Post Installation Script" "$HOME"/.xinitrc; then
+        sed -i '/Post Installation Script/d' "$HOME"/.xinitrc
+        echo "Post Installation Script won't be shown after booting again."
+    else
+        echo "Post Installation Script was already removed from the start-up list."
+    fi
+}
+
+
+
+################################################################################
+################################### OPTION Q ###################################
+################################################################################
+
+
+
+quit() {
+    while true; do
+        read -s -n 1 -p "Are you sure you want to quit? [y/N] " yesno
+        if [[ $yesno = [Yy] ]]; then
+            printf '%b\n' "\nThank you for installing!\nIf you'd want to run this script again later on, you can type 'postinstall' in your terminal.\nQuitting..."
+            exit 0
+        else
+            echo
+            break
+        fi
+    done
+}
+
+
+
+################################################################################
+################################## START HERE ##################################
+################################################################################
+
+
+
+starthere

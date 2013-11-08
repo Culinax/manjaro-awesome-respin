@@ -1,0 +1,37 @@
+#Translation
+_yes="Evet"
+_no="Hayir"
+_cancel="Iptal"
+_title="Manjaro Tus Haritasi Ayarlari"
+
+_return="Ana Menu ye Don"
+
+_exit="Cikis"
+
+_abort="Tus haritasi ve Konsol Font Ayarlarini Gec?"
+
+_error="Hata olustu, gecerli tus haritasi degismedi."
+
+_scanning="Tus haritalari taraniyor..."
+
+_select="Bir Tus Haritasi Secin"
+
+_load="Tus Haritasi Yukleniyor:"
+
+_menu=" ANA MENU "
+
+_desc=" ↓ ve ↑ ile menuler arasinda gezinin.\nUse TAB ile sekmeler arasinda gezin ve ENTER ile secin."
+
+_keymap="Tus haritasini Ayarla"
+
+_nokeymap="Tus Haritasi Yuklenemedi"
+
+_nofonts="Konsol Fontlari Yuklenemedi"
+
+_loadkeys="'Yukleme' Insa bulunamadi!"
+
+_setfont="'Font Ayari' Insa bulunamadi!"
+
+_km="km Baska Bir Ucbirimde Halen Calismaktadir!"
+
+_tmp="Lutfen km yurutmeden once /tmp/.km-running kaldirin!"

@@ -1,0 +1,27 @@
+#Translation
+_yes="Evet"
+_no="Hayir"
+_cancel="Iptal"
+_title="Manjaro Dil Ayarlari"
+
+_return="Ana Menuye Don"
+
+_exit="Cikis"
+
+_abort="Dil Ayarlarini Gec?"
+
+_error="Hata olustu, dil secilmedi."
+
+_select="Yereli Secin"
+
+_set="Yereli Ayarla:"
+
+_menu=" ANA MENU "
+
+_desc=" ↓ ve ↑ ile menuler arasinda gezin.\nUse TAB ile butonlar arasinda gezin ve ENTER ile secin."
+
+_locale="Yereli Ayarlayin"
+
+_lg="lg halen baska bir ucbirimde calismaktadir!"
+
+_tmp="Lutfen devam etmeden once /tmp/.lg-running silin!"

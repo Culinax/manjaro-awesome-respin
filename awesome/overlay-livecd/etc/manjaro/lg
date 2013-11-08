@@ -1,0 +1,145 @@
+#!/bin/bash
+# written by Alex Filgueira <faidoc@gmail.com>
+# adapted for Manjaro by Philip Müller <philm@manjaro.org>
+
+abort()
+{
+    DIALOG --yesno "${_abort}" 6 42 || return 0
+    [[ -e /tmp/.lg ]] && rm -f /tmp/.lg
+    [[ -e /tmp/.language ]] && rm -f /tmp/.language
+        [[ -e /tmp/.lg-running ]] && rm /tmp/.lg-running
+    clear
+    exit 1
+}
+
+kernel_cmdline ()
+{
+    for param in $(/bin/cat /proc/cmdline); do
+        case "${param}" in
+            $1=*) echo "${param##*=}"; return 0 ;;
+            $1) return 0 ;;
+            *) continue ;;
+        esac
+    done
+    [ -n "${2}" ] && echo "${2}"
+    return 1
+}
+
+# DIALOG()
+# an el-cheapo dialog wrapper
+#
+# parameters: see dialog(1)
+# returns: whatever dialog did
+DIALOG() {
+    dialog --backtitle "${TITLE}" --aspect 15 "$@"
+    return $?
+}
+
+error_lgset()
+{
+    DIALOG --msgbox "${_error}" 0 0
+}
+
+dolanguages() {
+    # "Scanning for locales..."
+    LOCALES=""
+    for i in $(cat ${DESTDIR}/etc/locale.gen | grep -v "#  " | sed 's/#//g' | sed 's/ UTF-8//g' | grep .UTF-8); do
+        LOCALES="${LOCALES} ${i} -"
+    done
+
+    CANCEL=""
+    DIALOG --menu "${_select}" 22 60 16 ${LOCALES} 2>${ANSWER} || CANCEL="1"
+    if [[ "${CANCEL}" = "1" ]]; then
+        S_NEXTITEM="1"
+        return 1
+    fi
+    locale=$(cat ${ANSWER})
+    echo ${locale} > /tmp/.locale
+    if [[ "${locale}" ]]; then
+        DIALOG --infobox "${_set} ${locale}" 0 0
+        sed -i "s/#\(${locale}\)/\1/" ${DESTDIR}/etc/locale.gen
+        echo "LANG=${locale}" > ${DESTDIR}/etc/locale.conf
+        echo "LC_COLLATE=C" >> ${DESTDIR}/etc/locale.conf
+        if [[ "$(cat ${DESTDIR}/etc/environment | grep LANG=)" = "" ]]; then
+           echo "LANG=${locale}" >> ${DESTDIR}/etc/environment
+        else
+           sed -i -e "s/^.*LANG=.*/LANG=${locale}/" ${DESTDIR}/etc/environment
+        fi
+    fi
+S_NEXTITEM=2
+}
+
+
+mainmenu() {
+    if [[ -n "${S_NEXTITEM}" ]]; then
+        DEFAULT="--default-item ${S_NEXTITEM}"
+    else
+        DEFAULT=""
+    fi
+    DIALOG ${DEFAULT} --backtitle "${TITLE}" --title "${_menu}" \
+                --menu "${_desc}" 17 58 13 \
+        "1" "${_locale}" \
+        "2" "${EXIT}" 2>${ANSWER}
+    case $(cat ${ANSWER}) in
+        "1")
+            dolanguages
+            ;;
+        "2")
+            [[ -e /tmp/.lg-running ]] && rm /tmp/.lg-running
+            clear
+            exit 0 ;;
+        *)
+            abort ;;
+    esac
+}
+
+: >/tmp/.language
+: >/tmp/.lg
+
+# do UID checking here so someone can at least get usage instructions
+if [ "$EUID" != "0" ]; then
+    echo "error: This script must be run as root."
+    exit 1
+fi
+
+# force to use english
+export LANG=en_US.UTF-8
+export LC_MESSAGES=en_US.UTF-8
+
+# Translation
+source /etc/manjaro/functions
+LOCALE=$(get_country)
+
+# English
+source /etc/manjaro/lg-en.lng
+# Turkish
+if [ "${LOCALE}" = "tr_TR" ]; then
+   source /etc/manjaro/lg-tr.lng
+fi
+
+ANSWER="/tmp/.lg"
+TITLE="${_title}"
+
+if [[ "${1}" = "--setup" ]]; then
+    EXIT="${_return}"
+    DESTDIR="/install"
+else
+    EXIT="${_exit}"
+    DESTDIR=""
+fi
+
+if [[ -e /tmp/.lg-running ]]; then
+    echo "${_lg}"
+    echo "${_tmp}"
+    exit 1
+fi 
+: >/tmp/.lg-running
+
+while true; do
+    mainmenu
+done
+
+clear
+exit 0
+
+# vim: set ts=4 sw=4 et:

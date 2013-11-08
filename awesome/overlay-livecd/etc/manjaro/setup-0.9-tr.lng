@@ -1,0 +1,341 @@
+# Translation
+_yes="Evet"
+_no="Hayir"
+_cancel="Iptal"
+_continue_label="Devam"
+_grubdetectdisks="GRUB2 Haritasi hazirlaniyor.. \n\n Lutfen bekleyin."
+_errorfscreate="Dosya sistemi olusturma hatasi"
+_errormounting="Baglama hatasi"
+_mkswaperr="Takas alani olusturma hatasi:"
+_swaponerr="Takas alani etkinlestirme hatasi:"
+_umountingall="Takas alani kapatiliyor,bagli diskler ayriliyor..."
+_presentlyavaildisks="Erisilebilir diskler:"
+_selectdisktouse="Kullanilacak disk i secin"
+_enterbootpartsize="/boot bolumu icin deger girin(MiB).En az 50."
+_diskspaceleft="Kalan disk alani:"
+_errorincorrectsize="HATA: Gecersiz bir deger girdiniz.Lutfen tekrar girin."
+_errorsizetoobig="HATA: Gereginden az/fazla deger girdiniz, lutfen tekrar girin."
+_enterswappartsize="Takas alani icin (MiB) degerini girin."
+_enterrootpartsize="/ (kok) bolumu icin deger girin. /Ev bolumu, kalan alani kullanacak."
+_homepartsize="/ Ev bolumu degeri:"
+_selecthomerootfs="/ ve /home bolumleri icin dosya sistemini girin:"
+_fshomeroottobeused="/ ve /Ev icin kullanilacak. Onayliyormusunuz?"
+_willbeerased='TUMUYLE SILINECEK! Devam?'
+_alreadyprepparts='Bolumleriniz hazir durumda!'
+_invaliddevice="Gecersiz Aygit:"
+_invaliddestdir="Hedef dizin gecersiz:"
+_onlyonerootpart="Bir tane root bolumu gerekiyor"
+_partitioningdev="Bolumlendiriliyor"
+_errorpartitioningdev="Bolumlendirme hatasi"
+_errordetails="Ayrintilar Goruntuleniyor"
+_preparationfinished='Bolumlendirme bitti !'
+_partsalreadyprepared='Sisteminizi zaten bolumlendirdiniz !'
+_selectdisktopart1="Bolumlendirilecek diski secin ya da yapildi ise '"
+_selectdisktopart2="' tiklayin"
+_enterdiskpath="Bolumlendirilecek aygit icin tam yolu girin"
+_prepartitionmessage="Sectiginiz disk cfdisk ile bolumlendirilecek. Sizden yeniden baslatmanizi isterse baslatin, bu uygulamayi calistirin ve kurulumu yeniden baslatin."
+_nowchooseparts2use="Kullanacaginiz bolumleri secin."
+_selectswappart="Takas alani icin bolum secin"
+_formatpart="Bicimlendir"
+_allcontentswillbelost='Tum icerik silinecek!'
+_selecttherootpart="/ (kok) icin bolum secin"
+_selectfsfor="Dosya sistemi secin"
+_wannamountotherparts="Diger bolumleri naslangicta baglamak istiyormusunuz? (secimli)"
+_selectmpoint="Baglama noktasi secin"
+_twopartsonamp='HATA: Ayni dizinde iki bolum !'
+_formatconfirmmessage="Devam? \n\nSozdizimi\n---------\nAYGIT:TIP:BAGLAMA NOKTASI:BICIM"
+_creatingactswap="Takas olusturuluyor ve etkinlesitiriliyor"
+_activatingswapon="Takas alani etkinlestiriliyor"
+_formattingpart="Bicimlendiriliyor"
+_mountingparton="Baglaniyor"
+_mountingpart="Baglaniyor"
+_partsmountsuccess="Bolumler basari ile baglandi."
+
+_givecorrectname="Lutfen gecerli bir kull. adi girin.\n ==> Tip: kucuk harfler olmali, sekillerle baslayamaz"
+_givename="Yeni kull. adini girin"
+_givepass="Yeni kull. adi icin parola girin :"
+_addsudouserdl1="Bu kullaniciya \""
+_addsudouserdl2="\" yetkili kull. haklari verilsin mi?"
+
+_installchoice='Sisteminizi yuklemek icin "unsquashfs" kullanmak istermisiniz?\n\nBu, "sqf-files" dosyalarini acmak ve HDD ye yuklemek icin standart ve hizli secenektir. Sisteminize en az 1GB (RAM) yuklenecektir (eklenebilir RAM tavsiye edilir).\n\nEger "cp"  kullanacaksiniz, 'HAYIR' cevabini verin ve kuruluma devam edin.\n\nSiradaki adim kurulumu baslatacak. Lutfen sabirli olun!'
+_installationwillstart='Kurulum basliyor. Lutfen bekleyin!'
+_installationinprogress="Kuruluyor..."
+_installationfail='KURULAMADI!'
+_installationsuccess='KURULDU!'
+
+_configuringsystem="Yapilandiriliyor..."
+_addonsinsttitle=" ==== Eklentilerin Kurulmasi ===="
+_wichaddonsinstall="Hangi eklenditleri yuklemek istiyorsunuz?"
+_whichaddonsinst1='1) Erisilebilir kuurulabilir eklentilerden seciniz'
+_whichaddonsinst2='2) Bagli eklentiler arasindan secin'
+_whichaddonsinstn="n) Eklenti yukleme"
+_installthisaddon="Kur? [E/H]"
+_addoninstalled="kuruldu."
+_wantcplivehome="Gecerli kisisel dizininizi kuruluma eklemek istiyormusunuz? [E/H]"
+_wantcplivechg="Canli ortamda, yapilan degisiklikleri kuruluma eklemek istiyormusunuz? [E/H]"
+_livechg_rwroot="Bu rwroot dizini icerigi demektir."
+_pressentercont="Devam icin enter..."
+
+_isgrubinst="Grub2 kurulumu? Bulunamadi"
+_autodetectrootfail="Kok bolumu algilanamadi. El ile baglayin"
+_youwilleditmenulst="GRUB2 yapilandirma dosyasini olusturacaksiniz (grub.cfg). Herseyin yapilandirildigini kontrol etmelisiniz."
+_nohdfound="Disk bulunamadi"
+_whereinststage1="GRUB2 nereye kurulsun? (Genellikle MBR /dev/sda uzerine kurulur)."
+_installinggrub="GRUB2 Kuruluyor..."
+_missingrootpart="HATA:kayip/gecersiz kok root aygiti:"
+_cannotfindgrub="GRUB2 root ve kurulum aygitlari yerlestirilemedi. GRUB2 kabugu kullanarak onyukleyiciyi manuel kurmalisiniz."
+_bootsonanydisk="Ana disk/anakarti degistirmeniz kullanisli olacak"
+_chainloadexpl="sda1 deki sistem icin secimli giris"
+_enterrootdevpath="root bolumu icin yol girin"
+_errorinstgrub="HATA: GRUB2 kurulamadi."
+_instgrubsuccess="GRUB2 kurulumu basarili."
+
+_machinetimezone="Makine zamanini UTC evrensel zamanina ayarlayin (tavsiye edilir) ya da yerel zamana ayarlayin(Ikinci bir isletim sisteminiz var ise)?"
+_selectregion="Lutfen bolge secin"
+_selecttimezone="Lutfen zaman dilimini secin"
+_choosedatetime="Tarihi girin .\ndegerler arasi gecis icin <TAB> kullanin."
+_choosehourtime="Zamani girin .\ndegerler arasi gecis icin <TAB> kullanin."
+
+_diskpreparation="Disk(ler) in hazirlanmasi"
+_assistprepa="Zorlayarak ayarlama (diskteki tum verileri siler)"
+_manualpartit="El ile bolumlendirme"
+_mainmenulabel="Ana menu"
+_runninginitcpio="mkinitcpio yurutuluyor..."
+_runninginitcpiotitle="initramfs imaji olusturuluyor..."
+_mkinitcpiofailerror="HATA - mkinitcpio yu el ile calistirin, degilse sisteminiz acilmayabilir."
+
+_localegen="yerellestiriliyor..."
+_syncpacmandb="pacman veri tabani eslestiriliyor..."
+_updatemirrorlist="Pacman yansilari guncelleniyor..."
+_setupalsa="ALSA yapilandiriliyor..."
+_installvideodriver="MHWD suruculerinizi yukluyor..."
+_setupsystemd="SystemD yapilandiriliyor..."
+_setupdisplaymanager="Goruntu yoneticisi yapilandiriliyor..."
+_fixapps="Bazi uygulamalar cozumleniyor..."
+
+_unsquash_dialog_title="Sistem dosyalari kuruluyor..."
+_unsquash_dialog_info1="Arsiv aciliyor:"
+_unsquash_dialog_info2="\nLutfen bekleyin..."
+_unsquasherror_title="Arsiv acilamadi!..."
+
+_passwdtitle="Parola kurulumu..."
+_passwddl="Parolanizi girin:"
+_passwddl1="Parolanizi girin:"
+_passwddl2="Parolanizi tekrar girin:"
+_passwddl3="Parolalar uyusmuyor!\nYeniden girin:"
+
+_definerootpass="Yetkili kullanici parolanizi belirleyin"
+_defineuser="Kullanici hesaplari"
+_defineuserpass="Kullanici parolasini belirleyin"
+_definelocale="Yereli degistirin (secimli)"
+_definekeymap="vconsole tus haritasini belirleyin (secimli)"
+_enterusername="Kullanici hesap adini degistirin.."
+_doeditconfig="Sisteminizi yapilandirin (secimli)"
+_return_label="Geri"
+_rcconftext="Ana sistem yapilandirilmasi"
+_fstabtext="Baglama noktalari ( lutfen kontrol edin)"
+_mkinitcpioconftext="Initramfs ayarlari"
+_modprobeconftext="Modul secenekleri ( sadece ozel durumlar )"
+_resolvconftext="DNS sunuculari (ag yoneticisince ayarlanir)"
+_hostnametext="Ag host adi (Sistem host adi)"
+_hoststext="Ag hosts (yerel DNS)"
+_hostsdenytext="Engellenmis ag servisleri"
+_hostsallowtext="Onaylanmis ag servisleri"
+_localegentext="Sistem dilini duzenleyin"
+_localeconftext="Kullanilacak varsayilan dili belirleyin"
+_environmenttext="Ortam dilini belirleyin"
+_mirrorlisttext="Paketlerin yansi listesi"
+_xorgevdevconftext="Xorg tus haritasi"
+_xorgkblayouttext="Xorg tus haritasi arayuzu"
+_vconsoletext="Ucbirim klavye arayuzu"
+_installabootloader="Onyukleyici kurulsun mu?"
+_installgrubbl='GRUB2 kur (yeniden baslatma gerekli)'
+_installnobl="Ne yaptiginizi biliyorsaniz."
+_installgrubdl1="Grub2 su ayarlarla yuklenecek :\n -> KOK bolumu:"
+_installgrubdl2=" -> Hedef bolum (MBR):"
+_installgrubdl3="Bu dogru mu? Degil ise \HAYIR\ ile devam edin ve hedef bolumu secin,dogru ise \"EVET\" ile devam edin."
+
+_none_label="Hicbiri"
+
+_mainmenuhelp="Yon tuslari ile secin ve enter tusu ile calistirin."
+_datetimetext="Tarih ve zamani girin"
+_networktext="Ag ayarini yapin"
+_preparediskstext="Disk(ler) in hazirlanmasi"
+_installsystemtext="Sistem kurulumu"
+_configuresystemtext="Sistem yapilandirilmasi"
+_instbootloadertext="Onyukleyici kurulumu"
+_quittext="Cikis"
+_installationfinished='Kurulum tamamlandi!'
+_cancelinstall="Kurulumdan cikilsin mi?"
+_instwelcomemessage="Manjaro Linux CLI Kurulum aracinin test surumune hosgeldiniz. \nBu surum, Manjaro' yu diskinize kurmanizda calismayabilir. \nBazi ozellikler henuz tumuyle test edilmemistir. Iyi sanslar!"
+_forgotsystemconf="Bilgi\n\nSistem yapilandirmasini unuttunuz."
+_forgotinstalling="Bilgi\n\nyapilandirmadan once kurulum yapmaniz daha mantiklidir."
+_forgotpreparehd="Bilgi\n\nOnce HDD 'nizi hazirlayin."
+
+_activate_dmraid="dmraid dizilisi etkinlestiriliyor..."
+
+_scanning_lvm2="Mantiksal birimler taraniyor..."
+_activate_lvm2="Mantiksal birimler etkinlestiriliyor..."
+
+_activate_raid="RAID duzeni etkinlestiriliyor..."
+
+_scanning_luks="Seckin sifreli aygitlar taraniyor..."
+_setup_luks="Kurulum, seckin sifreli aygitlar algiladi, etkinlestirilsin mi?"
+
+_destdir_1="Icinde kurulum bagli bolumleri algilayamadi "
+_destdir_2=", Lutfen once baglama noktalarini belirleyin."
+
+_geteditor="Yazi Yonetinizi belirleyin"
+_nano="nano (kolaydir)"
+
+_menu_descg="\nPARTUUID ve PARTLABEL, GPT disklerine ozgudur.\nGPT disklerinde, PARTUUID onerilir.\nMBR/msdos diskleri,"
+_device_name_scheme_1="Ayar dosyalarinda kullanacaginiz aygit semasi adini secin. "
+_device_name_scheme_2="FSUUID onerilir."
+
+_gptinfo="GUID Bolumleme Tablosu mu kullanacaksiniz(GPT)?\n\nFiziksel diskler arayuzu icin bir standarttir.UEFI nin bir parcasi olmasina ragmen(BIOS PC lerde degistirilebilir),bazi bios sistemlerde, en fazla 2 TiB disk alanini destekleyen.\n\nWindows XP ve daha eski Windows sistemler, kirilmadigi surece GUID bolumlendirme kullanilmis diskleri okuyamazlar yazamazlar,ancak, Vista, Windows 7 ve yeni Windows sistemler,GPT disklere erisebilen UEFI sistem icerirler.(Sadece UEFI sistemler Windows' u <gpt disklerde baslatabilir).\n\nDikkat:\n- Lutfen, diger sisteminizin GPT destegini kontrol edin!\n- LVM, RAID destekli GRUB2 icin bu secenegi secin\n  vs.., her zamanki 30 k MS-DOS eski MBR bosluguna sigmaz.\n- BIOS-GPT boot bazi Lenovo sistemlerde calismaz (Onyukleyici \n varligindan bagimsiz). "
+
+_disable_swap="Takas alani devre disi birakiliyor,bagli aygitlar ayriliyor..."
+
+_stop_md="Kurulum, isler durumda raid aygitlari algiladi, devre disi birakmak istiyor musunuz?"
+
+_disable_raid="Tum raid aygitlari devre disi birakiliyor..."
+
+_clear_superblock="Tum yazilimsal raid suruculerinin superbloklari temizleniyor..."
+_setup_superblock="Kurulum raid suruculere ait superbloklar tespit etti, bu superbloklari temizlemek ister misiniz ?"
+_clean_superblock="Raid aygit yazilimlarindan superbloklar temizleniyor..."
+
+_stoplvm="Kurulum lvm birimleri algiladi, kaldirmak istiyor musunuz?"
+_removelvm="Mantiksal birimler kaldiriliyor ..."
+_removelvg="Mantiksal gruplar kaldiriliyor ..."
+_removepvm="Fiziksel birimler kaldiriliyor ..."
+
+_stopluks="Setup detected running luks encrypted devices, do you want to remove them completely?"
+_removeluks="Removing luks encrypted devices ..."
+_stoprluks="Setup detected not running luks encrypted devices, do you want to remove them completely?"
+_removerluks="Removing not running luks encrypted devices ..."
+
+_deactivateraid="Deactivating dmraid devices ..."
+_setupraid="Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?"
+_resetraid="Resetting devicemapper devices ..."
+_resetdm="Resetting devicemapper devices ..."
+_reactivatedm="Reactivating dmraid devices ..."
+
+_help_raid="LINUX YAZILIMI RAID OZETI:\n
+-----------------------------\n\n
+Linear mode:\n
+You have two or more partitions which are not necessarily the same size\n
+(but of course can be), which you want to append to each other.\n
+Spare-disks are not supported here. If a disk dies, the array dies with\n
+it.\n\n
+RAID-0:\n
+You have two or more devices, of approximately the same size, and you want\n
+to combine their storage capacity and also combine their performance by\n
+accessing them in parallel. Like in Linear mode, spare disks are not\n
+supported here either. RAID-0 has no redundancy, so when a disk dies, the\n
+array goes with it.\n\n
+RAID-1:\n
+You have two devices of approximately same size, and you want the two to\n
+be mirrors of each other. Eventually you have more devices, which you\n
+want to keep as stand-by spare-disks, that will automatically become a\n
+part of the mirror if one of the active devices break.\n\n
+RAID-4:\n
+You have three or more devices of roughly the same size and you want\n
+a way that protects data against loss of any one disk.\n
+Fault tolerance is achieved by adding an extra disk to the array, which\n
+is dedicated to storing parity information. The overall capacity of the\n
+array is reduced by one disk.\n
+The storage efficiency is 66 percent. With six drives, the storage\n
+efficiency is 87 percent. The main disadvantage is poor performance for\n
+multiple,\ simultaneous, and independent read/write operations.\n
+Thus, if any disk fails, all data stay intact. But if two disks fail,\n
+all data is lost.\n\n
+RAID-5:\n
+You have three or more devices of roughly the same size, you want to\n
+combine them into a larger device, but still to maintain a degree of\n
+redundancy fordata safety. Eventually you have a number of devices to use\n
+as spare-disks, that will not take part in the array before another device\n
+fails. If you use N devices where the smallest has size S, the size of the\n
+entire array will be (N-1)*S. This \"missing\" space is used for parity\n
+(redundancy) information. Thus, if any disk fails, all data stay intact.\n
+But if two disks fail, all data is lost.\n\n
+RAID-6:\n
+You have four or more devices of roughly the same size and you want\n
+a way that protects data against loss of any two disks.\n
+Fault tolerance is achieved by adding an two extra disk to the array,\n
+which is dedicated to storing parity information. The overall capacity\n
+of the array is reduced by 2 disks.\n
+Thus, if any two disks fail, all data stay intact. But if 3 disks fail,\n
+all data is lost.\n\n
+RAID-10:\n
+Shorthand for RAID1+0, a mirrored striped array and needs a minimum of\n
+two disks. It provides superior data security and can survive multiple\n
+disk failures. The main disadvantage is cost, because 50% of your\n
+storage is duplication."
+
+_alldm="All devices in use. No more devices left for new creation."
+
+_enter_node="Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n"
+_enter_node2="Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1"
+_error_node="ERROR: You have defined 2 identical node names! Please enter another name."
+_raid_level="Select the raid level you want to use"
+_select_partiy="Select the parity layout you want to use (default is left-symmetric)"
+_select_dv="Select device"
+_select_addv="Select additional device"
+_degraded_raid="Would you like to create a degraded raid on"
+_question_raid1="Would you like to create"
+_question_raid2="like this?"
+_parted_raid="Now you'll be put into the parted program where you can partition your raiddevice to your needs."
+_no_raid_left="No devices left for physical volume creation."
+_select_dvnr1="Select additional device number"
+_select_dvnr2="for physical volume"
+_create_vm="Would you like to create physical volume on devices below?"
+_creating_vm="Creating physical volume on"
+
+_no_vg_left="No devices left for Volume Group creation."
+_enter_vg="Enter the Volume Group name:"
+_error_vg="ERROR: You have defined 2 identical Volume Group names! Please enter another name."
+_info_vg="Physical Volumes that are not shown in next dialog, are already in use!"
+
+_for="for"
+
+_select_pvg="Select Physical Volume"
+_select_ad_pvg="Select additional Physical Volume"
+_create_vg="Would you like to create Volume Group like this?"
+_creating_vg="Creating Volume Group"
+
+_help_lvm="LOGICAL VOLUME SUMMARY:\n
+-----------------------------\n\n
+LVM is a Logical Volume Manager for the Linux kernel. With LVM you can\n
+abstract your storage space and have \"virtual partitions\" which are easier\n
+to modify.\n\nThe basic building block of LVM are:\n
+- Physical volume (PV):\n
+  Partition on hard disk (or even hard disk itself or loopback file) on\n
+  which you can have virtual groups. It has a special header and is\n
+  divided into physical extents. Think of physical volumes as big building\n
+  blocks which can be used to build your hard drive.\n
+- Volume group (VG):\n
+  Group of physical volumes that are used as storage volume (as one disk).\n
+  They contain logical volumes. Think of volume groups as hard drives.\n
+- Logical volume(LV):\n
+  A \"virtual/logical partition\" that resides in a volume group and is\n
+  composed of physical extents. Think of logical volumes as normal\n
+  partitions."
+
+_help_luks="LUKS ENCRYPTION SUMMARY:\n
+-----------------------------\n\n
+Encryption is useful for two (related) reasons.\n
+Firstly, it prevents anyone with physical access to your computer,\n
+and your hard drive in particular, from getting the data from it\n
+(unless they have your passphrase/key).\n
+Secondly, it allows you to wipe the data on your hard drive with\n
+far more confidence in the event of you selling or discarding\n
+your drive.\n
+Basically, it supplements the access control mechanisms of the operating\n
+system (like file permissions) by making it harder to bypass the operating\n
+system by inserting a boot CD, for example. Encrypting the root partition\n
+prevents anyone from using this method to insert viruses or trojans onto\n
+your computer.\n\n
+ATTENTION:\n
+Having encrypted partitions does not protect you from all possible\n
+attacks. The encryption is only as good as your key management, and there\n
+are other ways to break into computers, while they are running."

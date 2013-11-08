@@ -1,0 +1,33 @@
+# SLiM theme for Manjaro Awesome WM Respin made by Culinax
+
+# Messages (ie: shutdown)
+msg_color               #e8e8e8
+msg_font                Verdana:size=13:bold:dpi=96
+msg_x                   49%
+msg_y                   49%
+msg_shadow_color #222222
+msg_shadow_xoffset 1
+msg_shadow_yoffset 1
+
+# valid values: stretch, tile
+background_style        stretch
+background_color        #eedddd
+
+# Input controls
+input_panel_x           50%
+input_panel_y           50%
+input_name_x            195
+input_name_y            145
+input_font          	Verdana:size=12:dpi=96
+input_color             #1c1c1c
+
+# Username / password request
+username_font          	Verdana:size=14:bold:dpi=96
+username_color        	#e8e8e8
+username_x              188
+username_y              100
+password_x              188
+password_y              100
+
+username_msg            Username:
+password_msg            Password:

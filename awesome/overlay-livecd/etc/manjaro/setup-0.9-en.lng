@@ -1,0 +1,342 @@
+# Translation
+_yes="Yes"
+_no="No"
+_cancel="Cancel"
+_continue_label="Continue"
+_grubdetectdisks="Generating GRUB2 device map...\n\n Please be patient."
+_errorfscreate="Error creating filesystem"
+_errormounting="Error mounting"
+_mkswaperr="Error creating swap:"
+_swaponerr="Error activating swap:"
+_umountingall="Disabling swapspace, unmounting already mounted disk devices..."
+_presentlyavaildisks="Available disks:"
+_selectdisktouse="Select the hard drive to use"
+_enterbootpartsize="Enter the size (MiB) of your /boot partition.  Minimum is 50."
+_diskspaceleft="Disk space left:"
+_errorincorrectsize="ERROR: You entered an invalid size, please enter again."
+_errorsizetoobig="ERROR: You entered a too small or large size, please enter again."
+_enterswappartsize="Enter the size (MiB) of your swap partition."
+_enterrootpartsize="Enter the size (MiB) of your / (root) partition.  The /home partition will use the remaining space."
+_homepartsize="Size of /home partition:"
+_selecthomerootfs="Select a filesystem for / and /home partitions:"
+_fshomeroottobeused="will be used for / and /home. OK?"
+_willbeerased='will be COMPLETELY ERASED! Proceed?'
+_alreadyprepparts='You have already prepared your partitions!'
+_invaliddevice="Invalid device:"
+_invaliddestdir="Destination directory invalid:"
+_onlyonerootpart="We need exactly one root partition"
+_partitioningdev="Partitioning"
+_errorpartitioningdev="Error partitioning"
+_errordetails="Details displayed on"
+_preparationfinished='Preparation finished !'
+_partsalreadyprepared='You have already prepared your filesystems !'
+_selectdisktopart1="Select the disk to partition (or "
+_selectdisktopart2=" when you have finished)"
+_enterdiskpath="Enter the full path to the device you wish to partition"
+_prepartitionmessage="You will now partition the selected disk with cfdisk.\nIf it asks you to reboot, do it, launch this program again and restart installation."
+_nowchooseparts2use="You will now select the partitions to use."
+_selectswappart="Select the partition to use as swap"
+_formatpart="Format"
+_allcontentswillbelost='Its contents will be erased!'
+_selecttherootpart="Select the partition for / (root)"
+_selectfsfor="Select the filesystem for"
+_wannamountotherparts="Do you want to mount other static partitions at bootup ? (optional)"
+_selectmpoint="Select the mountpoint (directory) for"
+_twopartsonamp='ERROR: two partitions on the same directory!'
+_formatconfirmmessage="Continue?\n\nSyntax\n------\nDEVICE:TYPE:MOUNTPOINT:FORMAT"
+_creatingactswap="Creating and activating swap on"
+_activatingswapon="Activating swap on"
+_formattingpart="Formatting"
+_mountingparton="mounting on"
+_mountingpart="Mounting"
+_partsmountsuccess="Partitions were successfully mounted."
+
+_givecorrectname="Please enter a valid username.\n ==> Tip: lowercase, can't start with a figure"
+_givename="Enter the new username"
+_givepass="Type the pasword for the new user :"
+_addsudouserdl1="Should User \""
+_addsudouserdl2="\" get sudo rights?"
+
+_installchoice='Do you want to use "unsquashfs" to install your system?\n\nIt is the standard and fastest option to unpack our "sqf-files" to your harddrive. At least 1 GB of memory (RAM) should be installed on your system (additional RAM is recommended).\n\nIf you want to use "cp" instead, answer with "No" and continue your installation.\n\nNext step will start the installation. Please be patient!'
+_installationwillstart='Installation will now start. Please be patient!'
+_installationinprogress="Installation in progress..."
+_installationfail='Installation failed!'
+_installationsuccess='Installation succeeded!'
+
+_configuringsystem="Configuration in progress..."
+_addonsinsttitle=" ==== Addons installation ===="
+_wichaddonsinstall="Which addons do you want to install?"
+_whichaddonsinst1='1) Choose among available installable addons'
+_whichaddonsinst2='2) Install installable addons among currently mounted addons'
+_whichaddonsinstn="n) Don't install any add-on"
+_installthisaddon="install? [y/N]"
+_addoninstalled="installed."
+_wantcplivehome="Do you want to copy the current personal folder into the installation? [y/n]"
+_wantcplivechg="Do you want to copy into the installation the changes done in live? [y/n]"
+_livechg_rwroot="This means the contents of your rwroot folder."
+_pressentercont="Press enter to continue..."
+
+_isgrubinst="Is GRUB2 installed? Cannot find"
+_autodetectrootfail="Root partition autodetection failed.  Modify manually"
+_youwilleditmenulst="You will now edit the GRUB2 configuration file (grub.cfg). You just have to check, everything should be already configured."
+_nohdfound="No hard disk found"
+_whereinststage1="Where do you want to install GRUB2's stage1? (most of the time on the MBR, i.e. /dev/sda)."
+_installinggrub="Installing GRUB2..."
+_missingrootpart="Error: missing/invalid root device:"
+_cannotfindgrub="GRUB2 root and setup devices could not be auto-located.  You will need to manually run the GRUB2 shell to install a bootloader."
+_bootsonanydisk="useful if you change your hard disk/mainboard"
+_chainloadexpl="Optional entry for the system on sda1"
+_enterrootdevpath="Enter the path of the root partition"
+_errorinstgrub="Error installing GRUB2."
+_instgrubsuccess="GRUB2 successfully installed."
+
+_machinetimezone="Set the machine time to UTC universal time (recommended) or local time (if you have a dual-boot with a system requiring it)?"
+_selectregion="Please select a region"
+_selecttimezone="Please select a timezone"
+_choosedatetime="Set the date.\nUse <TAB> to navigate and arrow keys to change values."
+_choosehourtime="Set the time.\nUse <TAB> to navigate and up/down to change values."
+
+_diskpreparation="Hard disk(s) preparation"
+_assistprepa="Assisted preparation (erases the whole disk)"
+_manualpartit="Partition by hand and choose the partitions to use"
+_mainmenulabel="Main menu"
+_runninginitcpio="Running mkinitcpio..."
+_runninginitcpiotitle="Building initramfs image..."
+_mkinitcpiofailerror="ERROR - You will have to run mkinitcpio by hand, either way the system may not boot."
+
+_localegen="Generating locales..."
+_syncpacmandb="Synchronising pacman databases..."
+_updatemirrorlist="Updating pacman mirrorlist..."
+_setupalsa="Configuring ALSA..."
+_installvideodriver="MHWD is installing your video driver(s)..."
+_setupsystemd="Configuring SystemD..."
+_setupdisplaymanager="Configuring the display manager..."
+_fixapps="Fixing some applications..."
+
+_unsquash_dialog_title="Installing system files..."
+_unsquash_dialog_info1="Unsquashing archive:"
+_unsquash_dialog_info2="\nPlease wait..."
+_unsquasherror_title="Unsquashing failed..."
+
+_passwdtitle="Password setup..."
+_passwddl="Enter your password for:"
+_passwddl1="Enter your password for:"
+_passwddl2="Re-Enter your password for:"
+_passwddl3="Password don't match!\nRe-Enter your password for:"
+  
+_definerootpass="Change root password"
+_defineuser="Setup user account(s)"
+_defineuserpass="Change user password"
+_definelocale="Change locale (optional)"
+_definekeymap="Change vconsole keymap (optional)"
+_enterusername="Enter user account name..."
+_doeditconfig="Edit system configuration (optional)"
+_return_label="Back"
+_rcconftext="Main system configuration"
+_fstabtext="Mount points (please check)"
+_mkinitcpioconftext="Initramfs config (can be lightened)"
+_modprobeconftext="Module options (special cases only)"
+_resolvconftext="DNS servers (managed by networkmanager)"
+_hostnametext="Network hostname (Systems hostname)"
+_hoststext="Network hosts (local DNS)"
+_hostsdenytext="Blocked network services"
+_hostsallowtext="Authorized network services"
+_localegentext="Edit system languages"
+_localeconftext="Edit default used language"
+_environmenttext="Edit environment language"
+_mirrorlisttext="Packages mirror list"
+_xorgevdevconftext="Xorg keymap"
+_xorgkblayouttext="Xorg keyboard layout"
+_vconsoletext="Console keyboard layout"
+_installabootloader="Install a bootloader?"
+_installgrubbl='Install GRUB2 (needed to boot)'
+_installnobl="If you know what you're doing."
+_installgrubdl1="Grub2 will be installed with followed settings:\n -> Boot partition:"
+_installgrubdl2=" -> Target partition (MBR):"
+_installgrubdl3="Is this correct? If not answer with \"No\" to change your target partition, else continue with \"Yes\"."
+
+_none_label="None"
+
+_mainmenuhelp="Use ↓ and ↑ to choose an entry, enter to launch it." 
+_datetimetext="Set date and time"
+_networktext="Set up Network"
+_preparediskstext="Disk(s) preparation"
+_installsystemtext="Install system"
+_configuresystemtext="Configure system"
+_instbootloadertext="Install bootloader"
+_quittext="Quit"
+_installationfinished='Installation finished!'
+_cancelinstall="Cancel installation?"
+_instwelcomemessage="Welcome to the TESTING Manjaro Linux CLI installation program. \nThis version might not work for you installing Manjaro to your harddrive. \nSome features aren't fully tested yet. Good luck!"
+_forgotsystemconf="Information\n\nYou forgot to configurate your system."
+_forgotinstalling="Information\n\nInstalling before configuring would seem more logical."
+_forgotpreparehd="Information\n\nPrepare your HDD first."
+
+_activate_dmraid="Activating dmraid arrays..."
+
+_scanning_lvm2="Scanning logical volumes..."
+_activate_lvm2="Activating logical volumes..."
+
+_activate_raid="Activating RAID arrays..."
+
+_scanning_luks="Scanning for luks encrypted devices..."
+_setup_luks="Setup detected luks encrypted device, do you want to activate"
+
+_destdir_1="Setup couldn't detect mounted partition(s) in "
+_destdir_2=", please set mountpoints first."
+
+_geteditor="Select a Text Editor to Use"
+_nano="nano (easier)"
+
+_menu_descg="\nPARTUUID and PARTLABEL are specific to GPT disks.\nIn GPT disks, PARTUUID is recommended.\nIn MBR/msdos disks,"
+_device_name_scheme_1="Select the device name scheme you want to use in config files. "
+_device_name_scheme_2=" FSUUID is recommended."
+
+_gptinfo="Do you want to use GUID Partition Table (GPT)?\n\nIt is a standard for the layout of the partition table on a physical hard disk. Although it forms a part of the Unified Extensible Firmware Interface (UEFI) standard (replacement for the PC BIOS firmware), it is also used on some BIOS systems because of the limitations of MBR aka msdos partition tables, which restrict maximum disk size to 2 TiB.\n\nWindows XP and earlier Windows systems cannot (without hacks) read or write to drives formatted with a GUID partition table, however, Vista and Windows 7 and later versions include the capability to use GPT for non-boot aka data disks (only UEFI systems can boot Windows from GPT disks).\n\nAttention:\n- Please check if your other operating systems have GPT support!\n- Use this option for a GRUB(2) setup, which should support LVM, RAID\n  etc., which doesn't fit into the usual 30k MS-DOS post-MBR gap.\n- BIOS-GPT boot may not work in some Lenovo systems (irrespective of the\n 
+  bootloader used). "
+
+_disable_swap="Disabling swapspace, unmounting already mounted disk devices..."
+
+_stop_md="Setup detected already running raid devices, do you want to disable them completely?"
+
+_disable_raid="Disabling all software raid devices..."
+
+_clear_superblock="Cleaning superblocks of all software raid devices..."
+_setup_superblock="Setup detected superblock of raid devices, do you want to clean the superblock of them?"
+_clean_superblock="Cleaning superblocks of all software raid devices..."
+
+_stoplvm="Setup detected lvm volumes, volume groups or physical devices, do you want to remove them completely?"
+_removelvm="Removing logical volumes ..."
+_removelvg="Removing logical groups ..."
+_removepvm="Removing physical volumes ..."
+
+_stopluks="Setup detected running luks encrypted devices, do you want to remove them completely?"
+_removeluks="Removing luks encrypted devices ..."
+_stoprluks="Setup detected not running luks encrypted devices, do you want to remove them completely?"
+_removerluks="Removing not running luks encrypted devices ..."
+
+_deactivateraid="Deactivating dmraid devices ..."
+_setupraid="Setup detected running dmraid devices and/or running lvm2, luks encrypted devices. If you reduced/deleted partitions on your dmraid device a complete reset of devicemapper devices is needed. This will reset also your created lvm2 or encrypted devices. Are you sure you want to do this?"
+_resetraid="Resetting devicemapper devices ..."
+_resetdm="Resetting devicemapper devices ..."
+_reactivatedm="Reactivating dmraid devices ..."
+
+_help_raid="LINUX SOFTWARE RAID SUMMARY:\n
+-----------------------------\n\n
+Linear mode:\n
+You have two or more partitions which are not necessarily the same size\n
+(but of course can be), which you want to append to each other.\n
+Spare-disks are not supported here. If a disk dies, the array dies with\n
+it.\n\n
+RAID-0:\n
+You have two or more devices, of approximately the same size, and you want\n
+to combine their storage capacity and also combine their performance by\n
+accessing them in parallel. Like in Linear mode, spare disks are not\n
+supported here either. RAID-0 has no redundancy, so when a disk dies, the\n
+array goes with it.\n\n
+RAID-1:\n
+You have two devices of approximately same size, and you want the two to\n
+be mirrors of each other. Eventually you have more devices, which you\n
+want to keep as stand-by spare-disks, that will automatically become a\n
+part of the mirror if one of the active devices break.\n\n
+RAID-4:\n
+You have three or more devices of roughly the same size and you want\n
+a way that protects data against loss of any one disk.\n
+Fault tolerance is achieved by adding an extra disk to the array, which\n
+is dedicated to storing parity information. The overall capacity of the\n
+array is reduced by one disk.\n
+The storage efficiency is 66 percent. With six drives, the storage\n
+efficiency is 87 percent. The main disadvantage is poor performance for\n
+multiple,\ simultaneous, and independent read/write operations.\n
+Thus, if any disk fails, all data stay intact. But if two disks fail,\n
+all data is lost.\n\n
+RAID-5:\n
+You have three or more devices of roughly the same size, you want to\n
+combine them into a larger device, but still to maintain a degree of\n
+redundancy fordata safety. Eventually you have a number of devices to use\n
+as spare-disks, that will not take part in the array before another device\n
+fails. If you use N devices where the smallest has size S, the size of the\n
+entire array will be (N-1)*S. This \"missing\" space is used for parity\n
+(redundancy) information. Thus, if any disk fails, all data stay intact.\n
+But if two disks fail, all data is lost.\n\n
+RAID-6:\n
+You have four or more devices of roughly the same size and you want\n
+a way that protects data against loss of any two disks.\n
+Fault tolerance is achieved by adding an two extra disk to the array,\n
+which is dedicated to storing parity information. The overall capacity\n
+of the array is reduced by 2 disks.\n
+Thus, if any two disks fail, all data stay intact. But if 3 disks fail,\n
+all data is lost.\n\n
+RAID-10:\n
+Shorthand for RAID1+0, a mirrored striped array and needs a minimum of\n
+two disks. It provides superior data security and can survive multiple\n
+disk failures. The main disadvantage is cost, because 50% of your\n
+storage is duplication."
+
+_alldm="All devices in use. No more devices left for new creation."
+
+_enter_node="Enter the node name for the raiddevice:\n/dev/md[number]\n/dev/md0\n/dev/md1\n\n"
+_enter_node2="Enter the node name for partitionable raiddevice:\n/dev/md_d[number]\n/dev/md_d0\n/dev/md_d1"
+_error_node="ERROR: You have defined 2 identical node names! Please enter another name."
+_raid_level="Select the raid level you want to use"
+_select_partiy="Select the parity layout you want to use (default is left-symmetric)"
+_select_dv="Select device"
+_select_addv="Select additional device"
+_degraded_raid="Would you like to create a degraded raid on"
+_question_raid1="Would you like to create"
+_question_raid2="like this?"
+_parted_raid="Now you'll be put into the parted program where you can partition your raiddevice to your needs."
+_no_raid_left="No devices left for physical volume creation."
+_select_dvnr1="Select additional device number"
+_select_dvnr2="for physical volume"
+_create_vm="Would you like to create physical volume on devices below?"
+_creating_vm="Creating physical volume on"
+
+_no_vg_left="No devices left for Volume Group creation."
+_enter_vg="Enter the Volume Group name:"
+_error_vg="ERROR: You have defined 2 identical Volume Group names! Please enter another name."
+_info_vg="Physical Volumes that are not shown in next dialog, are already in use!"
+
+_for="for"
+
+_select_pvg="Select Physical Volume"
+_select_ad_pvg="Select additional Physical Volume"
+_create_vg="Would you like to create Volume Group like this?"
+_creating_vg="Creating Volume Group"
+
+_help_lvm="LOGICAL VOLUME SUMMARY:\n
+-----------------------------\n\n
+LVM is a Logical Volume Manager for the Linux kernel. With LVM you can\n
+abstract your storage space and have \"virtual partitions\" which are easier\n
+to modify.\n\nThe basic building block of LVM are:\n
+- Physical volume (PV):\n
+  Partition on hard disk (or even hard disk itself or loopback file) on\n
+  which you can have virtual groups. It has a special header and is\n
+  divided into physical extents. Think of physical volumes as big building\n
+  blocks which can be used to build your hard drive.\n
+- Volume group (VG):\n 
+  Group of physical volumes that are used as storage volume (as one disk).\n
+  They contain logical volumes. Think of volume groups as hard drives.\n 
+- Logical volume(LV):\n
+  A \"virtual/logical partition\" that resides in a volume group and is\n 
+  composed of physical extents. Think of logical volumes as normal\n
+  partitions."
+
+_help_luks="LUKS ENCRYPTION SUMMARY:\n
+-----------------------------\n\n
+Encryption is useful for two (related) reasons.\n
+Firstly, it prevents anyone with physical access to your computer,\n
+and your hard drive in particular, from getting the data from it\n
+(unless they have your passphrase/key).\n
+Secondly, it allows you to wipe the data on your hard drive with\n
+far more confidence in the event of you selling or discarding\n
+your drive.\n
+Basically, it supplements the access control mechanisms of the operating\n
+system (like file permissions) by making it harder to bypass the operating\n
+system by inserting a boot CD, for example. Encrypting the root partition\n
+prevents anyone from using this method to insert viruses or trojans onto\n
+your computer.\n\n
+ATTENTION:\n
+Having encrypted partitions does not protect you from all possible\n
+attacks. The encryption is only as good as your key management, and there\n
+are other ways to break into computers, while they are running."

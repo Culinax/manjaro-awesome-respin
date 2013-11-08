@@ -1,0 +1,18 @@
+Changelog
+
+0.8.8rc1-b3 (28/10/2013)
+    Default shell changed to zsh
+    Infinality font rendering
+    Post Installation Script is completely rewritten
+    Kernel 3.11
+    Added NetworkManager, nm-applet, Conky, ClipIt, Midori
+    Unagi replaces Compton
+    Removed scratchpad manager
+    Several small changes in configuration files / scripts
+
+0.8.7.1-b2 (12/10/2013)
+    Added Post Installation Script
+    Updated several configuration files
+
+0.8.7.1-b1 (28/10/2013)
+    First release
