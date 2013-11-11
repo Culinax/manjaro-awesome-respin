@@ -18,7 +18,8 @@ xrdb -merge ~/.Xresources
 (sleep 1 && urxvtd -q -o -f) &
 (sleep 1 && unagi) &
 (sleep 1 && volnoti) &
-(sleep 2 && thunar --daemon) &
+(sleep 2 && spacefm -d) &
+(sleep 3 && udevil) &
 (sleep 3 && conky) &
 
 # Applications

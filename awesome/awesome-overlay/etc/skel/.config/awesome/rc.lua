@@ -342,7 +342,7 @@ globalkeys = awful.util.table.join(
 
     -- Applications
     awful.key({ modkey }, "d", function () awful.util.spawn_with_shell("dwb") end),
-    awful.key({ modkey }, "t", function () awful.util.spawn_with_shell("thunar") end)
+    awful.key({ modkey }, "t", function () awful.util.spawn_with_shell("spacefm") end)
 )
 
 clientkeys = awful.util.table.join(

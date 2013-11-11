@@ -51,11 +51,9 @@ clipit
 volumeicon
 
 ## Applications
-thunar
-thunar-archive-plugin
-thunar-media-tags-plugin
+spacefm
+udevil
 file-roller
-gvfs
 tumbler
 rxvt-unicode
 scrot
