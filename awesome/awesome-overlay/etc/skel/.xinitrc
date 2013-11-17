@@ -15,6 +15,7 @@ fi
 xrdb -merge ~/.Xresources
 
 # Daemons
+(sleep 1 && urxvtd -q -o -f) &
 (sleep 1 && unagi) &
 (sleep 1 && volnoti) &
 (sleep 2 && spacefm -d) &
@@ -26,7 +27,7 @@ sleep 1 && xdg_menu --format awesome  >${HOME}/.config/awesome/menu.lua
 (sleep 2 && volumeicon) &
 (sleep 2 && clipit) &
 (sleep 4 && nm-applet) &
-(sleep 4 && sakura -x postinstall) & # Post Installation Script
+(sleep 4 && urxvtc -e postinstall) & # Post Installation Script
 
 # Window Manager
 exec "$1"

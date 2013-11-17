@@ -15,6 +15,7 @@ fi
 xrdb -merge ~/.Xresources
 
 # Daemons
+(sleep 1 && urxvtd -q -o -f) &
 (sleep 1 && unagi) &
 (sleep 1 && volnoti) &
 (sleep 2 && spacefm -d) &
