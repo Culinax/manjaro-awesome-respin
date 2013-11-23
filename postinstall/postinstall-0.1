@@ -33,15 +33,15 @@ to start from the first step and then work your way down.
 }
 
 print_cats() {
-    opts=("Quick awesome WM starting guide (description + mous/keybindings)"\
-          "Manjaro specific keybindings"\
-          "Rank mirrorlist, sync to the repositories and update the system"\
-          #"Install drivers"\
-          "Install applications sorted by category"\
-          "Never display at boot again"\
-          "Quit")
+    main_opts=("Quick awesome WM starting guide (description + mous/keybindings)"\
+               "Manjaro specific keybindings"\
+               "Rank mirrorlist, sync to the repositories and update the system"\
+               "Install drivers"\
+               "Install applications sorted by category"\
+               "Never display at boot again"\
+               "Quit")
     idx=1
-    for i in "${opts[@]}"; do
+    for i in "${main_opts[@]}"; do
         if [[ ${i%% *} = "Never" ]]; then
             echo "r. $i"
         elif [[ ${i%% *} = "Quit" ]]; then
@@ -54,7 +54,7 @@ print_cats() {
     echo
 }
 
-starthere() {
+welcome() {
     clear
     print_title
     print_main
@@ -64,7 +64,6 @@ make sure that you have a working connection before you continue. Press [Return]
 to perform a connection check.
 "
     installedcheck
-    main
     while true; do
         read -s -n 1 -p "> " input
         if [[ $input = "" ]]; then
@@ -103,16 +102,17 @@ main() {
                     break
                     ;;
                 3)  clear
-                    ranksyncupdate
+                    ranksyncupdate && synced=1
                     clear
                     break
                     ;;
-#                4)  clear
-#                    installdrivers
-#                    clear
-#                    break
-#                    ;;
-                4)  clear
+                4)  (( ! synced == 1 )) && { printf '%b\n' "Please run the third option first to avoid breaking your system due to partial\n  updates."; continue; }
+                    clear
+                    install_drivers
+                    clear
+                    break
+                    ;;
+                5)  clear
                     installapps
                     clear
                     break
@@ -127,6 +127,44 @@ main() {
             esac
         done
     done
+}
+
+
+
+# "GLOBAL" FUNCTIONS ###########################################################
+
+
+install_check() {
+    if "$@"; then
+        while true; do
+            printf '%b\n' "\nInstallation finished successfully. Press [Return] to finish.\n"
+            while true; do
+                read -s -n 1 -p "> " input
+                if [[ $input = "" ]]; then
+                    break
+                else
+                    echo "Press [Return] to finish"
+                    continue
+                fi
+            done
+            break
+        done
+
+    else
+        while true; do
+            printf '%b\n' "\nIt seems like an error occured. Please analyze the output carefully to solve the problem. Press [Return] to finish.\n"
+            while true; do
+                read -s -n 1 -p "> " input
+                if [[ $input = "" ]]; then
+                    break
+                else
+                    echo "Press [Return] to finish"
+                    continue
+                fi
+            done
+            break
+        done
+    fi
 }
 
 
@@ -211,46 +249,106 @@ ranksyncupdate(){
     fi
     sudo pacman-mirrors -g
     sudo pacman -Syy manjaro-system pacman --needed 2>/dev/null
-    if sudo pacman -Su; then
-        while true; do
-            printf '%b\n' "\nInstallation finished successfully. Press [Return] to finish.\n"
-            while true; do
-                read -s -n 1 -p "> " input
-                if [[ $input = "" ]]; then
-                    break
-                else
-                    echo "Press [Return] to finish"
-                    continue
-                fi
-            done
-            break
-        done
-
-    else
-        while true; do
-            printf '%b\n' "\nIt seems like an error occured. Please analyze the output carefully to solve the problem. Press [Return] to finish.\n"
-            while true; do
-                read -s -n 1 -p "> " input
-                if [[ $input = "" ]]; then
-                    break
-                else
-                    echo "Press [Return] to finish"
-                    continue
-                fi
-            done
-            break
-        done
-
-    fi
+    install_check sudo pacman -Su
 }
 
 
 
 # OPTION INSTALL DRIVERS #######################################################
 
-#TODO# Install graphics / multimedia / printing (/ AUR?) #TODO#
-installdrivers() {
-    :
+
+install_drivers() {
+    while true; do
+        print_title " > Install Drivers\n"
+        printf '%b\n' "Select the correct number of the driver you want to install.\n"
+        driver_opts=("AUR support"\
+                     "Graphics driver"\
+                     "Multimedia support"\
+                     "Printer drivers"\
+                     "Quit")
+        idx=1
+        for i in "${driver_opts[@]}"; do
+            if [[ ${i%% *} = "Quit" ]]; then
+                echo "q. $i"
+            else
+                echo "${idx}. $i"
+            fi
+            (( idx++ ))
+        done
+        echo
+        while true; do
+            read -s -n 1 -p "> " REPLY
+            case "$REPLY" in
+                1)  clear
+                    install_aur
+                    clear
+                    break
+                    ;;
+                2)  clear
+                    install_graphics
+                    clear
+                    break
+                    ;;
+                3)  clear
+                    install_media
+                    clear
+                    break
+                    ;;
+                4)  clear
+                    install_printer
+                    clear
+                    break
+                    ;;
+                q)  quitcat=1
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    continue
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+install_aur() {
+    print_title " > Install Drivers > AUR Support\n"
+    printf '%b\n' "This option will install the necessary packages required to properly install\npackages available in the AUR. Most of these belong to the base-devel group and\nare required for compiling them. Yaourt will be installed as AUR helper.\n"
+    install_check sudo pacman -S autoconf automake binutils bison fakeroot flex gcc libtool m4 make patch yaourt
+}
+
+install_graphics() {
+    print_title " > Install Drivers > Graphics Driver\n"
+    printf '%b\n' "This option will install the correct graphics driver with the help of the\nManjaro Hardware Detection tool. MHWD automatically detects your graphics card\nand installs the proper drivers for it. Please enter the correct number,\ndepending whether you want the open-source (free) or the proprietary (non-free)\ndrivers.\n\n1. Open-source drivers (free)\n2. Proprietary drivers (non-free)\n"
+    while true; do
+        read -s -n 1 -p "> " REPLY
+        case "$REPLY" in
+            1)  install_check sudo mhwd -a pci free 0300
+                break
+                ;;
+            2)  install_check sudo mhwd -a pci nonfree 0300
+                break
+                ;;
+            *)  echo "Invalid Option"
+                continue
+                ;;
+        esac
+    done
+}
+
+install_media(){
+    print_title " > Install Drivers > Multimedia Support\n"
+    printf '%b\n' "This option will install the packages necessary for full multimedia support.\nThis includes codecs, dvd decryption and flashplayer.\n"
+    install_check sudo pacman -S gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly gstreamer0.10-bad-plugins gstreamer0.10-base-plugins gstreamer0.10-good-plugins gstreamer0.10-ugly-plugins flashplugin libdvdcss icedtea-web-java7
+}
+
+install_printer() {
+    print_title " > Install Drivers > Printer Drivers\n"
+    printf '%b\n' "This option will install the drivers necessary for printing. The package\nmanjaro-printer will be installed, which is a wrapper for the most important\nprinter drivers."
+    install_check sudo pacman -S manjaro-printer
+    systemctl enable cups
+    systemctl start cups
 }
 
 
@@ -274,7 +372,7 @@ installedcheck() {
     done
 }
 
-contains_app() {
+in_array() {
     local i
     for i in "${@:2}"; do
         [[ $i = $1 ]] && return 0
@@ -323,7 +421,7 @@ list_install() {
 #TODO# [1-"${#applistbak[@]}"]) seems to stop at 7 even though there are higher numbers #TODO#
                     *)  opt=${applistbak[$REPLY-1]}
                         (( REPLY > ${#applistbak[@]} )) && echo "Invalid Option" && continue
-                        if contains_app "$opt" "${!applist[@]}"; then
+                        if in_array "$opt" "${!applist[@]}"; then
                             unset applist[$opt]
                         else
                             applist[$opt]=
@@ -353,7 +451,7 @@ list_install() {
 
     installlist=()
     for app in "${!applist[@]}"; do
-        if ! contains_app "$app" "${!installedlist[@]}"; then
+        if ! in_array "$app" "${!installedlist[@]}"; then
             installlist+=("$app")
         fi
     done
@@ -364,7 +462,7 @@ list_install() {
 list_remove() {
     declare -A remlist
     for app in "${!installedlist[@]}"; do 
-        if ! contains_app "$app" "${!applist[@]}"; then
+        if ! in_array "$app" "${!applist[@]}"; then
             remlist[$app]=
         fi
     done
@@ -382,7 +480,7 @@ list_remove() {
 #TODO# [1-"${#applistbak[@]}"]) seems to stop at 7 even though there are higher numbers #TODO#
                     *)  opt=${remlistbak[$REPLY-1]}
                         (( REPLY > ${#remlistbak[@]} )) && echo "Invalid Option" && continue
-                        if contains_app "$opt" "${!remlist[@]}"; then
+                        if in_array "$opt" "${!remlist[@]}"; then
                             unset remlist[$opt]
                         else
                             remlist[$opt]=
@@ -419,31 +517,7 @@ list_remove() {
 install_apps() {
     clear
     print_title " > Install Applications > Install Applications\n"
-    if sudo pacman -S "${installlist[@],,}"; then
-        printf '%b\n' "\nInstallation finished successfully. Press [Return] to finish.\n"
-        while true; do
-            read -s -n 1 -p "> " input
-            if [[ $input = "" ]]; then
-                break
-            else
-                echo "Press [Return] to finish."
-            fi
-        done
-        for app in "${installlist[@]}"; do
-            installedlist[$app]=
-        done
-    
-    else
-        printf '%b\n' "\nIt seems like an error occured during the installation. Please analyze the output carefully to solve the\nproblem. Press [Return] to finish.\n"
-        while true; do
-            read -s -n 1 -p "> " input
-            if [[ $input = "" ]]; then
-                break
-            else
-                echo "Press [Return] to finish."
-            fi
-        done
-    fi
+    install_check sudo pacman -S "${installlist[@],,}"
 }
 
 remove_apps() {
@@ -639,9 +713,9 @@ cal_cat() {
         idx=1
         for app in "${calapps[@]}"; do
             desc="${caldesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-9s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-9s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -651,7 +725,7 @@ cal_cat() {
                     ;;
                 [1-${#calapps[@]}])
                     opt=${calapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -674,9 +748,9 @@ cddvd_cat() {
         idx=1
         for app in "${cddvdapps[@]}"; do
             desc="${cddvddesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -686,7 +760,7 @@ cddvd_cat() {
                     ;;
                 [1-${#cddvdapps[@]}])
                     opt=${cddvdapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -709,9 +783,9 @@ chat_cat() {
         idx=1
         for app in "${chatapps[@]}"; do
             desc="${chatdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -721,7 +795,7 @@ chat_cat() {
                     ;;
                 [1-${#chatapps[@]}])
                     opt=${chatapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -744,9 +818,9 @@ email_cat() {
         idx=1
         for app in "${emailapps[@]}"; do
             desc="${emaildesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-12s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-12s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -756,7 +830,7 @@ email_cat() {
                     ;;
                 [1-${#emailapps[@]}])
                     opt=${emailapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -779,9 +853,9 @@ graphic_cat() {
         idx=1
         for app in "${graphicapps[@]}"; do
             desc="${graphicdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-12s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-12s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -791,7 +865,7 @@ graphic_cat() {
                     ;;
                 [1-${#graphicapps[@]}])
                     opt=${graphicapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -814,9 +888,9 @@ imgview_cat() {
         idx=1
         for app in "${imgviewapps[@]}"; do
             desc="${imgviewdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-9s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-9s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -826,7 +900,7 @@ imgview_cat() {
                     ;;
                 [1-${#imgviewapps[@]}])
                     opt=${imgviewapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -849,9 +923,9 @@ irc_cat() {
         idx=1
         for app in "${ircapps[@]}"; do
             desc="${ircdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -861,7 +935,7 @@ irc_cat() {
                     ;;
                 [1-${#ircapps[@]}])
                     opt=${ircapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -884,9 +958,9 @@ file_cat() {
         idx=1
         for app in "${fileapps[@]}"; do
             desc="${filedesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-16s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-16s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -898,29 +972,29 @@ file_cat() {
                     clear
                     opt=${fileapps[$REPLY-1]}
 #TODO# GVfs is common between Thunar and PCManFM, but when e.g. PCManFM is removed and Thunar is not, GVfs is removed anyway. #TODO#
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                         if [[ $opt = "SpaceFM" ]]; then
                             for app in "${spacefmapps[@]}"; do
-                                if contains_app "$app" "${!applist[@]}"; then
+                                if in_array "$app" "${!applist[@]}"; then
                                     unset applist[$app]
                                 fi
                             done
                         elif [[ $opt = "Thunar" ]]; then
                             for app in "${thunarapps[@]}"; do
-                                if contains_app "$app" "${!applist[@]}"; then
+                                if in_array "$app" "${!applist[@]}"; then
                                     unset applist[$app]
                                 fi
                             done
                         elif [[ $opt = "PCManFM" ]]; then
                             for app in "${pcmanfmapps[@]}"; do
-                                if contains_app "$app" "${!applist[@]}"; then
+                                if in_array "$app" "${!applist[@]}"; then
                                     unset applist[$app]
                                 fi
                             done
                         elif [[ $opt = "Nautilus" ]]; then
                             for app in "${nautilusapps[@]}"; do
-                                if contains_app "$app" "${!applist[@]}"; then
+                                if in_array "$app" "${!applist[@]}"; then
                                     unset applist[$app]
                                 fi
                             done
@@ -954,9 +1028,9 @@ spacefm_cat() {
         idx=1
         for app in "${spacefmapps[@]}"; do
             desc="${spacefmdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-7s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-7s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -966,7 +1040,7 @@ spacefm_cat() {
                     ;;
                 [1-${#spacefmapps[@]}])
                     opt=${spacefmapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -989,9 +1063,9 @@ thunar_cat() {
         idx=1
         for app in "${thunarapps[@]}"; do
             desc="${thunardesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-25s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-25s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1001,7 +1075,7 @@ thunar_cat() {
                     ;;
                 [1-${#thunarapps[@]}])
                     opt=${thunarapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1024,9 +1098,9 @@ pcmanfm_cat() {
         idx=1
         for app in "${pcmanfmapps[@]}"; do
             desc="${pcmanfmdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-5s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-5s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1036,7 +1110,7 @@ pcmanfm_cat() {
                     ;;
                 [1-${#pcmanfmapps[@]}])
                     opt=${pcmanfmapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1059,9 +1133,9 @@ nautilus_cat() {
         idx=1
         for app in "${nautilusapps[@]}"; do
             desc="${nautilusdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-23s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-23s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1071,7 +1145,7 @@ nautilus_cat() {
                     ;;
                 [1-${#nautilusapps[@]}])
                     opt=${nautilusapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1094,9 +1168,9 @@ music_cat() {
         idx=1
         for app in "${musicapps[@]}"; do
             desc="${musicdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-11s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-11s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1107,11 +1181,11 @@ music_cat() {
                 [1-${#musicapps[@]}])
                     clear
                     opt=${musicapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                         if [[ $opt = "MPD" ]]; then
                             for app in "${mpdapps[@]}"; do
-                                if contains_app "$app" "${!applist[@]}"; then
+                                if in_array "$app" "${!applist[@]}"; then
                                     unset applist[$app]
                                 fi
                             done
@@ -1139,9 +1213,9 @@ mpd_cat() {
         idx=1
         for app in "${mpdapps[@]}"; do
             desc="${mpddesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1151,7 +1225,7 @@ mpd_cat() {
                     ;;
                 [1-${#mpdapps[@]}])
                     opt=${mpdapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1174,9 +1248,9 @@ office_cat() {
         idx=1
         for app in "${officeapps[@]}"; do
             desc="${officedesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-12s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-12s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1186,7 +1260,7 @@ office_cat() {
                     ;;
                 [1-${#officeapps[@]}])
                     opt=${officeapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1209,9 +1283,9 @@ pdf_cat() {
         idx=1
         for app in "${pdfapps[@]}"; do
             desc="${pdfdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-20s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-20s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1221,7 +1295,7 @@ pdf_cat() {
                     ;;
                 [1-${#pdfapps[@]}])
                     opt=${pdfapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1244,9 +1318,9 @@ rss_cat() {
         idx=1
         for app in "${rssapps[@]}"; do
             desc="${rssdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-11s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-11s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1256,7 +1330,7 @@ rss_cat() {
                     ;;
                 [1-${#rssapps[@]}])
                     opt=${rssapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1279,9 +1353,9 @@ sysmon_cat() {
         idx=1
         for app in "${sysmonapps[@]}"; do
             desc="${sysmondesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-6s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-6s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1291,7 +1365,7 @@ sysmon_cat() {
                     ;;
                 [1-${#sysmonapps[@]}])
                     opt=${sysmonapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1314,9 +1388,9 @@ term_cat() {
         idx=1
         for app in "${termapps[@]}"; do
             desc="${termdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-16s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-16s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1326,7 +1400,7 @@ term_cat() {
                     ;;
                 [1-${#termapps[@]}])
                     opt=${termapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1349,9 +1423,9 @@ text_cat() {
         idx=1
         for app in "${textapps[@]}"; do
             desc="${textdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1361,7 +1435,7 @@ text_cat() {
                     ;;
                 [1-${#textapps[@]}])
                     opt=${textapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1384,9 +1458,9 @@ torrent_cat() {
         idx=1
         for app in "${torrentapps[@]}"; do
             desc="${torrentdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-24s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-24s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1396,7 +1470,7 @@ torrent_cat() {
                     ;;
                 [1-${#torrentapps[@]}])
                     opt=${torrentapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1419,9 +1493,9 @@ util_cat() {
         idx=1
         for app in "${utilapps[@]}"; do
             desc="${utildesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-11s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-11s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1431,7 +1505,7 @@ util_cat() {
                     ;;
                 [1-${#utilapps[@]}])
                     opt=${utilapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1454,9 +1528,9 @@ video_cat() {
         idx=1
         for app in "${videoapps[@]}"; do
             desc="${videodesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-14s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-14s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1466,7 +1540,7 @@ video_cat() {
                     ;;
                 [1-${#videoapps[@]}])
                     opt=${videoapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1489,9 +1563,9 @@ web_cat() {
         idx=1
         for app in "${webapps[@]}"; do
             desc="${webdesc["$app"]}"
-            contains_app "$app" "${!applist[@]}" && CONTAINS="*"
-            echo "${idx}. ${CONTAINS:- } $(printf "%-12s|" "$app") ${desc}"
-            (( idx++ )) && CONTAINS=""
+            in_array "$app" "${!applist[@]}" && contains="*"
+            echo "${idx}. ${contains:- } $(printf "%-12s|" "$app") ${desc}"
+            (( idx++ )) && contains=""
         done
         echo
         while true; do
@@ -1501,7 +1575,7 @@ web_cat() {
                     ;;
                 [1-${#webapps[@]}])
                     opt=${webapps[$REPLY-1]}
-                    if contains_app "$opt" "${!applist[@]}"; then
+                    if in_array "$opt" "${!applist[@]}"; then
                         unset applist[$opt]
                     else
                         applist[$opt]=
@@ -1551,7 +1625,7 @@ quit() {
 
 
 
-# START HERE ###################################################################
+# WELCOME ######################################################################
 
 
-starthere
+welcome
