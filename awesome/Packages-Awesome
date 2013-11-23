@@ -72,30 +72,3 @@ newsbeuter
 cmus
 ranger
 audacious
-
-## Multimedia
-gst-libav
-gst-plugins-bad
-gst-plugins-base
-gst-plugins-good
-gst-plugins-ugly
-gstreamer0.10-bad-plugins
-gstreamer0.10-base-plugins
-gstreamer0.10-good-plugins
-gstreamer0.10-ugly-plugins
-flashplugin
-libdvdcss
-
-## AUR Access
-autoconf
-automake
-binutils
-bison
-fakeroot
-flex
-gcc
-libtool
-m4
-make
-patch
-yaourt
