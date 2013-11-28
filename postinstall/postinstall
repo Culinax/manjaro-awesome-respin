@@ -174,59 +174,59 @@ install_check() {
 
 #TODO# Write a quick user guide with keybindings + a more lengthy one for people who want to take the most out of their WM, describing configuration options etc. #TODO#
 documentation() {
-cat <<EOF
-List of added (non-default) keybindings. For default keybindings you can read the manpage of awesome.
-
-Basic keys
-    Mod4 + Shift + q
-        OBLogout
-    Mod4 + p
-        dmenu
-    Mod4 + b
-        Toggle wibox visibilaty
-    Mod4 + Shift + l
-        Lock the screen (slock)
-    Mod4 + F10
-        Toggle Conky HUD
-
-Applications
-    Mod4 + d
-        dwb (web browser)
-    Mod4 + t
-        Thunar (file manager)
-
-Switch to specific layout (compared to Mod4 + Space which iterates over all of them)
-    Mod4 + Control + f
-        Floating Mode
-    Mod4 + Control + t
-        Tiling Mode
-    Mod4 + Control + b
-        Bottom Stack
-    Mod4 + Control + s
-        Fair
-    Mod4 + Control + m
-        Maximized
-
-Volume Control
-    XF86AudioRaiseVolume
-        Raise volume (ALSA) while spawning Volnoti to show the current volume
-    XF86AudioLowerVolume
-        Lower volume (ALSA) while spawning Volnoti to show the current volume
-    XF86AudioMute
-        Toggle mute (ALSA) while spawning Volnoti to show the current volume
-
-Brightness Control
-    XF86MonBrightnessUp
-        Raise brightnesss while spawning Volnoti to show the current brightness
-    XF86MonBrightnessDown
-        Lower brightness while spawning Volnoti to show the current brightness
-
-PrintScreen
-    Print
-        Take a screenshot of the whole screen (scrot)
-    Shift + Print
-        Take a screenshot of a windows (scrot)
-EOF
+	cat <<-EOF
+	List of added (non-default) keybindings. For default keybindings you can read the manpage of awesome.
+	
+	Basic keys
+	    Mod4 + Shift + q
+	        OBLogout
+	    Mod4 + p
+	        dmenu
+	    Mod4 + b
+	        Toggle wibox visibilaty
+	    Mod4 + Shift + l
+	        Lock the screen (slock)
+	    Mod4 + F10
+	        Toggle Conky HUD
+	
+	Applications
+	    Mod4 + d
+	        dwb (web browser)
+	    Mod4 + t
+	        Thunar (file manager)
+	
+	Switch to specific layout (compared to Mod4 + Space which iterates over all of them)
+	    Mod4 + Control + f
+	        Floating Mode
+	    Mod4 + Control + t
+	        Tiling Mode
+	    Mod4 + Control + b
+	        Bottom Stack
+	    Mod4 + Control + s
+	        Fair
+	    Mod4 + Control + m
+	        Maximized
+	
+	Volume Control
+	    XF86AudioRaiseVolume
+	        Raise volume (ALSA) while spawning Volnoti to show the current volume
+	    XF86AudioLowerVolume
+	        Lower volume (ALSA) while spawning Volnoti to show the current volume
+	    XF86AudioMute
+	        Toggle mute (ALSA) while spawning Volnoti to show the current volume
+	
+	Brightness Control
+	    XF86MonBrightnessUp
+	        Raise brightnesss while spawning Volnoti to show the current brightness
+	    XF86MonBrightnessDown
+	        Lower brightness while spawning Volnoti to show the current brightness
+	
+	PrintScreen
+	    Print
+	        Take a screenshot of the whole screen (scrot)
+	    Shift + Print
+	        Take a screenshot of a windows (scrot)
+	EOF
 }
 
 
