@@ -62,10 +62,10 @@ ecryptfs-utils
 ## Fonts
 terminus-font
 ttf-bitstream-vera
-ttf-dejavu
+#ttf-dejavu # See ibfonts-meta-base
 ttf-inconsolata
 ttf-indic-otf
-ttf-liberation
+#ttf-liberation # See ibfonts-meta-base
 
 ## Network
 b43-fwcutter

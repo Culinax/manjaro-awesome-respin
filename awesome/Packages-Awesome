@@ -39,10 +39,9 @@ unagi # Local repo (AUR)
 volnoti-git # Local repo (Github)
 archlinux-xdg-menu # Local repo (Arch repos)
 zsh
-fontconfig-infinality-ultimate
-freetype2-infinality-ultimate
-cairo-infinality-ultimate
->x86_64 lib32-freetype2-infinality-ultimate
+infinality-bundle # Custom repo (infinality-bundle)
+>x86_64 infinality-bundle-multilib # Custom repo (infinality-bundle-multilib)
+ibfonts-meta-base # Custom repo (infinality-bundle-fonts)
 postinstall # Local repo (Own package)
 faenza-blue-dark # Local repo (Gnome-Look)
 conky
