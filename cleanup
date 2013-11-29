@@ -1,0 +1,7 @@
+#!/bin/bash
+
+case "$1" in
+    -a | --all)     sudo rm -r awesome/work*; rm awesome/*.iso; rm awesome/*-pkgs.txt ;;
+    -w | --work)    sudo rm -r awesome/work* ;;
+    -i | --iso)     rm awesome/*.iso; rm awesome/*-pkgs.txt ;;
+esac

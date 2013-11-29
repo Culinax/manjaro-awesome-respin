@@ -188,6 +188,10 @@ if [ "$openbox" == "Y" ] ; then
    rm -R work*/*isomounts*
    rm -R work*/build.make_de_image
    rm work*/iso/manjaro/*/openbox-image.sqfs
+   rm -R Packages-Xorg
+   rm -R pacman-gfx.conf
+   rm -R work*/*pkgs*
+   rm work*/iso/manjaro/*/pkgs-image.sqfs
 fi
 if [ "$awesome" == "Y" ] ; then
    echo ">> build awesome image"
