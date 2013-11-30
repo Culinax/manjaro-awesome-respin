@@ -12,8 +12,6 @@ local naughty = require("naughty")
 local menubar = require("menubar")
 -- Vicious
 local vicious = require("vicious")
--- Menu
-local menu = require("menu")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -95,25 +93,7 @@ end
 -- }}}
 
 -- {{{ Menu
--- Create a laucher widget and a main menu
-myawesomemenu = {
-   { "manual", terminal .. " -e man awesome" },
-   { "edit config", editor_cmd .. " " .. awesome.conffile },
-   { "restart", awesome.restart },
-   { "quit", "oblogout" }
-}
-
-mymainmenu = awful.menu({ items = { { "Applications", xdgmenu, beautiful.awesome_icon },
-                                    { "awesome", myawesomemenu },
-                                    { "open terminal", terminal }
-                                  }
-                        })
-
-mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
-                                     menu = mymainmenu })
-
--- Menubar configuration
-menubar.utils.terminal = terminal -- Set the terminal for applications that require it
+require("freedesktop/freedesktop")
 -- }}}
 
 -- {{{ Wibox

@@ -37,7 +37,6 @@ slim
 dmenu-xft-height # Local repo (AUR)
 unagi # Local repo (AUR)
 volnoti-git # Local repo (Github)
-archlinux-xdg-menu # Local repo (Arch repos)
 zsh
 infinality-bundle # Custom repo (infinality-bundle)
 >x86_64 infinality-bundle-multilib # Custom repo (infinality-bundle-multilib)
@@ -54,7 +53,6 @@ spacefm
 udevil
 file-roller
 tumbler
-xterm
 rxvt-unicode
 scrot
 mpv
