@@ -23,7 +23,6 @@ xrdb -merge ~/.Xresources
 (sleep 3 && conky) &
 
 # Applications
-sleep 1 && xdg_menu --format awesome  >${HOME}/.config/awesome/menu.lua
 (sleep 2 && volumeicon) &
 (sleep 2 && clipit) &
 (sleep 4 && nm-applet) &
