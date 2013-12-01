@@ -32,6 +32,7 @@ adwaita-manjaro-themes
 ## Base Packages
 awesome
 vicious
+lain # Local repo (AUR)
 oblogout
 slim
 dmenu-xft-height # Local repo (AUR)
