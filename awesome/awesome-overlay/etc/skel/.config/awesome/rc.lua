@@ -12,6 +12,8 @@ local naughty = require("naughty")
 local menubar = require("menubar")
 -- Vicious
 local vicious = require("vicious")
+-- Lain
+local lain = require("lain")
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -97,24 +99,66 @@ require("freedesktop/freedesktop")
 -- }}}
 
 -- {{{ Wibox
--- Create a textclock widget
-mytextclock = awful.widget.textclock("%A %d %B %H:%M ")
+markup      = lain.util.markup
+darkblue    = theme.bg_focus
+blue        = "#9EBABA"
+red         = "#EB8F8F"
 
 -- Separators
 spacer = wibox.widget.textbox(" ")
-seperator = wibox.widget.textbox(' <span color="#285577">|</span> ')
+seperator = wibox.widget.textbox(' <span color="' .. darkblue .. '">|</span> ')
+
+-- Create a textclock widget
+mytextclock = awful.widget.textclock("%A %d %B %H:%M ")
+-- Show calendar when hovering over mytextclock
+lain.widgets.calendar:attach(mytextclock)
 
 bat = wibox.widget.textbox()
-vicious.register(bat, vicious.widgets.bat, '<span color="#9eb1ba">Bat:</span> $2%', 30, "BAT0")
+vicious.register(bat, vicious.widgets.bat, '<span color="' .. blue .. '">Bat:</span> $2%', 30, "BAT0")
 
 cpu = wibox.widget.textbox()
-vicious.register(cpu, vicious.widgets.cpu, '<span color="#9eb1ba">CPU:</span> $1%', 2)
+vicious.register(cpu, vicious.widgets.cpu, '<span color="' .. blue .. '">CPU:</span> $1%', 2)
 
 mem = wibox.widget.textbox()
-vicious.register(mem, vicious.widgets.mem, '<span color="#9eb1ba">RAM:</span> $1% ($2MB)', 5)
+vicious.register(mem, vicious.widgets.mem, '<span color="' .. blue .. '">RAM:</span> $1% ($2MB)', 5)
 
 thermal  = wibox.widget.textbox()
-vicious.register(thermal, vicious.widgets.thermal, '<span color="#9eb1ba">Temp:</span> $1°C', 30, { "coretemp.0", "core"}) 
+vicious.register(thermal, vicious.widgets.thermal, '<span color="' .. blue .. '">Temp:</span> $1°C', 30, { "coretemp.0", "core"}) 
+
+-- ALSA
+vol = lain.widgets.alsa({
+    settings = function()
+        header = "Vol: "
+        level  = volume_now.level
+
+        if volume_now.status == "off" then
+            level = markup(red, level .. "M")
+        else
+            level = level .. "%"
+        end
+
+        widget:set_markup(markup(blue, header) .. level)
+    end
+})
+-- ALSA Mouse -- LeftClick=1 RightClick=3 ScrollUp=4 ScrollDown=5
+vol:buttons(awful.util.table.join(
+    awful.button({}, 1, function ()
+        awful.util.spawn(awful.util.getdir("config") .. "/volume.sh mute")
+        vol.update()
+    end),
+    awful.button({}, 3, function ()
+        awful.util.spawn(terminal .. " -e alsamixer")
+        vol.update()
+    end),
+    awful.button({}, 4, function ()
+        awful.util.spawn(awful.util.getdir("config") .. "/volume.sh up 2")
+        vol.update()
+    end),
+    awful.button({}, 5, function ()
+        awful.util.spawn(awful.util.getdir("config") .. "/volume.sh down 2")
+        vol.update()
+    end)
+))
 
 -- Create a wibox for each screen and add it
 mywibox = {}
@@ -199,7 +243,8 @@ for s = 1, screen.count() do
     local right_layout = wibox.layout.fixed.horizontal()
     right_layout:add(spacer)
     if s == 1 then right_layout:add(wibox.widget.systray()) end
-    right_layout:add(spacer)
+    right_layout:add(seperator)
+    right_layout:add(vol)
     right_layout:add(seperator)
     right_layout:add(thermal)
     right_layout:add(seperator)
