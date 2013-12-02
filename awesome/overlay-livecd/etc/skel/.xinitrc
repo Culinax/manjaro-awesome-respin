@@ -28,4 +28,5 @@ xrdb -merge ~/.Xresources
 (sleep 4 && nm-applet) &
 
 # Window Manager
+/opt/livecd/disable-dpms
 exec "$1"
