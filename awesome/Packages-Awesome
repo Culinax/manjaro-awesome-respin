@@ -33,17 +33,18 @@ adwaita-manjaro-themes
 awesome
 vicious
 lain # Local repo (AUR)
+awesome-freedesktop # Local repo (GitHub: https://github.com/almonteb/awesome-freedesktop)
 oblogout
 slim
 dmenu-xft-height # Local repo (AUR)
 unagi # Local repo (AUR)
-volnoti-git # Local repo (Github)
+volnoti-git # Local repo (GitHub: https://github.com/hcchu/volnoti)
 zsh
 infinality-bundle # Custom repo (infinality-bundle)
 >x86_64 infinality-bundle-multilib # Custom repo (infinality-bundle-multilib)
 ibfonts-meta-base # Custom repo (infinality-bundle-fonts)
 postinstall # Local repo (Own package)
-faenza-blue-dark # Local repo (Gnome-Look)
+faenza-blue-dark # Local repo (Gnome-Look: http://gnome-look.org/content/show.php/?content=136508)
 conky
 network-manager-applet
 clipit

@@ -14,6 +14,8 @@ local menubar = require("menubar")
 local vicious = require("vicious")
 -- Lain
 local lain = require("lain")
+-- freedesktop.org
+local freedesktop = require('freedesktop')
 
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -95,7 +97,19 @@ end
 -- }}}
 
 -- {{{ Menu
-require("freedesktop/freedesktop")
+freedesktop.utils.terminal = terminal
+freedesktop.utils.icon_theme = 'gnome'
+menu_items = freedesktop.menu.new()
+myawesomemenu = {
+   { "manual", terminal .. " -e man awesome", freedesktop.utils.lookup_icon({ icon = 'help' }) },
+   { "edit config", editor_cmd .. " " .. awful.util.getdir("config") .. "/rc.lua", freedesktop.utils.lookup_icon({ icon = 'package_settings' }) },
+   { "restart", awesome.restart, freedesktop.utils.lookup_icon({ icon = 'gtk-refresh' }) },
+   { "quit", "oblogout", freedesktop.utils.lookup_icon({ icon = 'gtk-quit' }) }
+}
+table.insert(menu_items, { "awesome", myawesomemenu, beautiful.awesome_icon })
+table.insert(menu_items, { "open terminal", terminal, freedesktop.utils.lookup_icon({icon = 'terminal'}) })
+mymainmenu = awful.menu({ items = menu_items, theme = { width = 150 } })
+mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon, menu = mymainmenu })
 -- }}}
 
 -- {{{ Wibox
