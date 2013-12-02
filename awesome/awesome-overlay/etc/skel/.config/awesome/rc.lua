@@ -349,10 +349,16 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "s", function () awful.layout.set(awful.layout.suit.fair) end),
     awful.key({ modkey, "Control" }, "m", function () awful.layout.set(awful.layout.suit.max) end),
 
-    -- Volume control (Script which uses 'volnoti' as notification) SYNTAX: up/down | percentage
-    awful.key({ }, "XF86AudioRaiseVolume", function () awful.util.spawn_with_shell(awful.util.getdir("config") .. "/volume.sh up 2") end),
-    awful.key({ }, "XF86AudioLowerVolume", function () awful.util.spawn_with_shell(awful.util.getdir("config") .. "/volume.sh down 2") end),
-    awful.key({ }, "XF86AudioMute",        function () awful.util.spawn_with_shell(awful.util.getdir("config") .. "/volume.sh mute") end),
+    -- Volume control (Script which uses 'volnoti' as notification) SYNTAX: up/down/mute | percentage
+    awful.key({ }, "XF86AudioRaiseVolume", function ()
+        awful.util.spawn(awful.util.getdir("config") .. "/volume.sh up 2")
+        vol.update() end),
+    awful.key({ }, "XF86AudioLowerVolume", function ()
+        awful.util.spawn(awful.util.getdir("config") .. "/volume.sh down 2")
+        vol.update() end),
+    awful.key({ }, "XF86AudioMute",        function ()
+        awful.util.spawn(awful.util.getdir("config") .. "/volume.sh mute")
+        vol.update() end),
 
     -- Brightness control (Script which uses 'volnoti' as notification) SYNTAX: up/down | percentage
     awful.key({ }, "XF86MonBrightnessUp",   function () awful.util.spawn_with_shell(awful.util.getdir("config") .. "/brightness.sh up 10") end),
@@ -447,7 +453,7 @@ awful.rules.rules = {
                      buttons = clientbuttons,
                      size_hints_honor = false, -- Remove gaps between terminals
                      callback = awful.client.setslave } }, -- Open new clients as slave instead of master
-    { rule_any = { class = {"mpv", "pinentry", "Oblogout", "feh", "Galculator"}, name = {"File Operation Progress", "Event Tester"} },  properties = { floating = true } }
+    { rule_any = { class = {"mpv", "pinentry", "Oblogout", "feh", "Galculator"}, name = {"Event Tester"} },  properties = { floating = true } }
 }
 -- }}}
 
