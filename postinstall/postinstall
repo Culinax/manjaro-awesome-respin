@@ -577,6 +577,7 @@ declare -A imgviewdesc=(\
     ["feh"]="Fast and light imlib2-based image viewer" \
     ["GPicView"]="lightweight image viewer" \
     ["Mirage"]="A simple GTK+ Image Viewer" \
+    ["sxiv"]="Simple X Image Viewer" \
     ["Viewnior"]="A simple, fast and elegant image viewer program")
 declare -A ircdesc=(\
     ["HexChat"]="A popular and easy to use graphical IRC (chat) client" \

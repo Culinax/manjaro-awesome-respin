@@ -467,7 +467,7 @@ awful.rules.rules = {
                      buttons = clientbuttons,
                      size_hints_honor = false, -- Remove gaps between terminals
                      callback = awful.client.setslave } }, -- Open new clients as slave instead of master
-    { rule_any = { class = {"mpv", "pinentry", "Oblogout", "feh", "Galculator"}, name = {"Event Tester"} },  properties = { floating = true } }
+    { rule_any = { class = {"mpv", "pinentry", "Oblogout", "Galculator"}, name = {"Event Tester"} },  properties = { floating = true } }
 }
 -- }}}
 
