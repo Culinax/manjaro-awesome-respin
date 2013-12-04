@@ -1609,8 +1609,8 @@ web_cat() {
 
 
 removefromstartup(){
-    if grep -q "Post Installation Script" "$HOME"/.xinitrc; then
-        sed -i '/Post Installation Script/d' "$HOME"/.xinitrc
+    if grep -q "postinstall" "$HOME"/.xinitrc; then
+        sed -i '/postinstall/d' "$HOME"/.xinitrc
         echo "Post Installation Script won't be shown after booting again."
     else
         echo "Post Installation Script was already removed from the start-up list."

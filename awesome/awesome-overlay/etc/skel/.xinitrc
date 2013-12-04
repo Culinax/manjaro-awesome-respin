@@ -26,7 +26,7 @@ xrdb -merge ~/.Xresources
 (sleep 2 && volumeicon) &
 (sleep 2 && clipit) &
 (sleep 4 && nm-applet) &
-(sleep 4 && urxvtc -e postinstall) & # Post Installation Script
+(sleep 4 && urxvtc -e postinstall) &
 
 # Window Manager
 exec "$1"
