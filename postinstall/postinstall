@@ -241,11 +241,22 @@ ranksyncupdate(){
 
     sudo pacman-key --init
     sudo pacman-key --populate archlinux manjaro
-    if grep -q "Post Installation Script" /etc/pacman.conf; then
-        if sudo sed -i '/Post Installation Script/d' /etc/pacman.conf; then
-            sudo pacman-key -r 962DDE58
-            sudo pacman-key --lsign-key 962DDE58
-        fi
+    if sudo pacman-key -r 962DDE58 && sudo pacman-key --lsign-key 962DDE58; then
+        idx=1
+        linenum=()
+        while read -r line; do
+            if [[ $line = "[infinality-bundle"* ]]; then
+                repo=1
+            elif [[ $repo = 1 && $line = SigLevel* ]]; then
+                linenum+=($idx)
+                repo=0
+            fi
+            (( idx++ ))
+        done < "/etc/pacman.conf"
+        
+        for (( idx=${#linenum[@]}-1; idx>=0; idx-- )); do
+            sed -i "${linenum[idx]}d" /etc/pacman.conf
+        done
     fi
     sudo pacman-mirrors -g
     sudo pacman -Syy manjaro-system pacman --needed 2>/dev/null
