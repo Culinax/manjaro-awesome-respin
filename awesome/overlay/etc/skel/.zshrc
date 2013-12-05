@@ -63,3 +63,6 @@ ex() {
     echo "'$1' is not a valid file"
   fi
 }
+
+PROMPT="[%n@%m %1~] "
+RPROMPT="%{$fg[red]%}%(?..[%?])%{$reset_color%}"
