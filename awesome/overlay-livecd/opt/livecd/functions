@@ -496,6 +496,9 @@ Server = http://ibn.net63.net/infinality-bundle-multilib/$arch" >> ${DESTDIR}/et
 SigLevel = Never
 Server = http://ibn.net63.net/infinality-bundle-fonts" >> ${DESTDIR}/etc/pacman.conf
 
+    # use testing repositories
+    sed -i 's/^\(Branch=\).*/\1testing/' ${DESTDIR}/etc/pacman-mirrors.conf
+
     # enable default mirror
     cp -f ${DESTDIR}/etc/pacman.d/mirrorlist ${DESTDIR}/etc/pacman.d/mirrorlist.backup
     if [ ! -z "$ping_check" ] ; then

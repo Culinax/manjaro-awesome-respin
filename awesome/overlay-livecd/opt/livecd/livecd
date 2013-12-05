@@ -39,6 +39,8 @@ fi
 # save settings
 alsactl -f /etc/asound.state store &>/dev/null
 
+sed -i 's/^\(Branch=\).*/\1testing/' /etc/pacman-mirrors.conf
+
 echo "enable default mirror" >> /tmp/livecd.log
 
 # enable default mirror
