@@ -1,3 +1,8 @@
+--[[
+    Cesious Awesome WM theme
+    Created by Culinax
+--]]
+
 -- Standard awesome library
 local gears = require("gears")
 local awful = require("awful")

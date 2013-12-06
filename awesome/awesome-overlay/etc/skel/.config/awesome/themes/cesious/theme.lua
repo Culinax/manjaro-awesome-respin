@@ -1,3 +1,8 @@
+--[[
+    Cesious Awesome WM theme
+    Created by Culinax
+--]]
+
 theme = {}
 theme.dir = os.getenv("HOME") .. "/.config/awesome/themes/cesious"
 
