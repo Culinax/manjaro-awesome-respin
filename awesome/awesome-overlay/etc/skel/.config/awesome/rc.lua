@@ -98,7 +98,6 @@ end
 
 -- {{{ Menu
 freedesktop.utils.terminal = terminal
-freedesktop.utils.icon_theme = 'gnome'
 menu_items = freedesktop.menu.new()
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome", freedesktop.utils.lookup_icon({ icon = 'help' }) },
