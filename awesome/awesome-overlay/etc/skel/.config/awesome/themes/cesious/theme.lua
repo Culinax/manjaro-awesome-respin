@@ -36,7 +36,7 @@ theme.taglist_squares_unsel = theme.dir .. "/taglist/squarew.png"
 -- Variables set for theming the menu:
 -- menu_[bg|fg]_[normal|focus]
 -- menu_[border_color|border_width]
-theme.menu_submenu_icon = theme.dir .. "/submenu.png"
+theme.menu_submenu_icon = theme.dir .. "/icons/submenu.png"
 theme.menu_height = 15
 theme.menu_width  = 100
 
@@ -85,7 +85,7 @@ theme.layout_tiletop    = theme.dir .. "/layouts/tiletop.png"
 theme.layout_spiral     = theme.dir .. "/layouts/spiral.png"
 theme.layout_dwindle    = theme.dir .. "/layouts/dwindle.png"
 
-theme.awesome_icon = os.getenv("HOME") .. "/.config/awesome/icons/manjaro64.png"
+theme.awesome_icon = theme.dir .. "/icons/manjaro64.png"
 
 -- Define the icon theme for application icons. If not set then the icons 
 -- from /usr/share/icons and /usr/share/icons/hicolor will be used.
