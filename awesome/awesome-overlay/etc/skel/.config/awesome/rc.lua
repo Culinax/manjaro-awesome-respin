@@ -131,9 +131,6 @@ mytextclock = awful.widget.textclock("%A %d %B %H:%M ")
 -- Show calendar when hovering over mytextclock
 lain.widgets.calendar:attach(mytextclock)
 
-bat = wibox.widget.textbox()
-vicious.register(bat, vicious.widgets.bat, '<span color="' .. blue .. '">Bat:</span> $2%', 30, "BAT0")
-
 cpu = wibox.widget.textbox()
 vicious.register(cpu, vicious.widgets.cpu, '<span color="' .. blue .. '">CPU:</span> $1%', 2)
 
@@ -146,16 +143,12 @@ vicious.register(thermal, vicious.widgets.thermal, '<span color="' .. blue .. '"
 -- ALSA
 vol = lain.widgets.alsa({
     settings = function()
-        header = "Vol: "
-        level  = volume_now.level
-
         if volume_now.status == "off" then
-            level = markup(red, level .. "M")
+            level = markup(red, volume_now.level .. "M")
         else
-            level = level .. "%"
+            level = volume_now.level .. "%"
         end
-
-        widget:set_markup(markup(blue, header) .. level)
+        widget:set_markup(markup(blue, "Vol: ") .. level)
     end
 })
 -- ALSA Mouse -- LeftClick=1 RightClick=3 ScrollUp=4 ScrollDown=5
@@ -177,6 +170,21 @@ vol:buttons(awful.util.table.join(
         vol.update()
     end)
 ))
+
+-- Battery
+bat = lain.widgets.bat({
+    battery = "BAT0",
+    settings = function()
+        if bat_now.perc == "N/A" then
+            perc = "AC"
+        elseif tonumber(bat_now.perc) <= 15 then
+            perc = markup(red, bat_now.perc .. "%")
+        else
+            perc = bat_now.perc .. "%"
+        end
+        widget:set_markup(markup(blue, "Bat: ") .. perc)
+    end
+})
 
 -- Create a wibox for each screen and add it
 mywibox = {}
