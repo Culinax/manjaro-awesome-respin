@@ -371,6 +371,7 @@ install_aur() {
             continue
         fi
     done
+
     install_check sudo pacman -S "${!aurlist[@]}"
     unset aurlist
 }
@@ -394,20 +395,97 @@ install_graphics() {
     done
 }
 
+mediaapps=("gst-libav" "gst-plugins-bad" "gst-plugins-base" "gst-plugins-good" "gst-plugins-ugly" "gstreamer0.10-bad-plugins" "gstreamer0.10-base-plugins" "gstreamer0.10-good-plugins" "gstreamer0.10-ugly-plugins" "flashplugin" "libdvdcss" "icedtea-web-java7")
+
 install_media(){
+    declare -A medialist
+    for app in "${mediaapps[@]}"; do
+        medialist[$app]=
+    done
+
     print_title " > Install Drivers > Multimedia Support\n"
     printf '%b\n' "This option will install the packages necessary for full multimedia support.\nThis includes codecs, dvd decryption and flashplayer.\n"
-    install_check sudo pacman -S gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly gstreamer0.10-bad-plugins gstreamer0.10-base-plugins gstreamer0.10-good-plugins gstreamer0.10-ugly-plugins flashplugin libdvdcss icedtea-web-java7
+    printf '%b ' "Packages listed for installation: ${!medialist[@]}"
+    printf '\n\n'
+    while true; do
+        read -s -n 1 -p "Do you want edit this list? [y/N] " yesno
+        if [[ $yesno = [Yy] ]]; then
+            clear
+            while true; do
+                print_title " > Install Drivers > Multimedia Support > Multimedia Packages\n"
+                printf '%b\n' "Select the correct number to remove a selection.\n\n0.   Install packages\n"
+                select opt in "${!medialist[@]}"; do
+                    case "$REPLY" in
+                        0)  quitcat=1; echo; break
+                            ;;
+                        *)  (( REPLY > ${#medialist[@]} )) && echo "Invalid Option" && continue
+                            in_array "$opt" "${!medialist[@]}" && unset medialist[$opt]
+                            clear; break
+                            ;;
+                    esac
+                done
+                (( quitcat == 1 )) && quitcat=0 && break
+            done
+            break
+        elif [[ $yesno = [Nn] || $yesno = "" ]]; then
+            printf '\n\n'
+            break
+        else
+            echo "Invalid option"
+            continue
+        fi
+    done
+
+    install_check sudo pacman -S "${!medialist[@]}"
+    unset medialist
 }
 
-install_printer() {
+printerapps=("cups" "ghostscript" "gsfonts" "cups-pdf" "foomatic-db" "foomatic-db-engine" "foomatic-db-nonfree" "foomatic-filters" "gutenprint" "splix" "hplip")
+
+install_printer(){
+    declare -A printerlist
+    for app in "${printerapps[@]}"; do
+        printerlist[$app]=
+    done
+
     print_title " > Install Drivers > Printer Drivers\n"
-    printf '%b\n' "This option will install the drivers necessary for printing. The package\nmanjaro-printer will be installed, which is a wrapper for the most important\nprinter drivers."
-    install_check sudo pacman -S manjaro-printer
+    printf '%b\n' " This option will install the drivers necessary for printing. This list contains\n several different drivers for different kinds of printer brands. If you don't\n want those, then you can edit the list of packages.\n "
+    printf '%b ' "Packages listed for installation: ${!printerlist[@]}"
+    printf '\n\n'
+    while true; do
+        read -s -n 1 -p "Do you want edit this list? [y/N] " yesno
+        if [[ $yesno = [Yy] ]]; then
+            clear
+            while true; do
+                print_title " > Install Drivers > Printer Drivers > Printer Packages\n"
+                printf '%b\n' "Select the correct number to remove a selection.\n\n0.   Install packages\n"
+                select opt in "${!printerlist[@]}"; do
+                    case "$REPLY" in
+                        0)  quitcat=1; echo; break
+                            ;;
+                        *)  (( REPLY > ${#printerlist[@]} )) && echo "Invalid Option" && continue
+                            in_array "$opt" "${!printerlist[@]}" && unset printerlist[$opt]
+                            clear; break
+                            ;;
+                    esac
+                done
+                (( quitcat == 1 )) && quitcat=0 && break
+            done
+            break
+        elif [[ $yesno = [Nn] || $yesno = "" ]]; then
+            printf '\n\n'
+            break
+        else
+            echo "Invalid option"
+            continue
+        fi
+    done
+
+    install_check sudo pacman -S "${!printerlist[@]}"
     systemctl enable cups
     systemctl start cups
+    unset printerlist
 }
-
 
 
 # OPTION INSTALL APPS BY CATEGORY ##############################################
