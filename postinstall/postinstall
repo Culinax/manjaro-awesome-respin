@@ -331,20 +331,7 @@ install_drivers() {
     done
 }
 
-declare -A aurdesc=(\
-    ["autoconf"]="A GNU tool for automatically configuring source code" \
-    ["automake"]="A GNU tool for automatically creating Makefiles" \
-    ["binutils"]="A set of programs to assemble and manipulate binary and object files" \
-    ["bison"]="The GNU general-purpose parser generator" \
-    ["fakeroot"]="Gives a fake root environment, useful for building packages as a non-privileged user" \
-    ["flex"]="A tool for generating text-scanning programs" \
-    ["gcc"]="The GNU Compiler Collection - C and C++ frontends" \
-    ["libtool"]="A generic library support script" \
-    ["m4"]="The GNU macro processor" \
-    ["make"]="GNU make utility to maintain groups of programs" \
-    ["patch"]="A utility to apply patch files to original sources" \
-    ["yaourt"]="A pacman wrapper with extended features and AUR support")
-aurapps=("${!aurdesc[@]}")
+aurapps=("autoconf" "automake" "binutils" "bison" "fakeroot" "flex" "gcc" "libtool" "m4" "make" "patch" "yaourt")
 
 install_aur() {
     declare -A aurlist
