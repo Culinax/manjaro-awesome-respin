@@ -33,7 +33,7 @@ to start from the first step and then work your way down.
 }
 
 print_cats() {
-    main_opts=("Quick awesome WM starting guide (description + mous/keybindings)"\
+    main_opts=("Quick awesome WM starting guide (description + mouse/keybindings)"\
                "Manjaro specific keybindings"\
                "Rank mirrorlist, sync to the repositories and update the system"\
                "Install drivers"\
@@ -133,6 +133,14 @@ main() {
 
 # "GLOBAL" FUNCTIONS ###########################################################
 
+
+in_array() {
+    local i
+    for i in "${@:2}"; do
+        [[ $i = $1 ]] && return 0
+    done
+    return 1
+}
 
 install_check() {
     if "$@"; then
@@ -323,10 +331,61 @@ install_drivers() {
     done
 }
 
+declare -A aurdesc=(\
+    ["autoconf"]="A GNU tool for automatically configuring source code" \
+    ["automake"]="A GNU tool for automatically creating Makefiles" \
+    ["binutils"]="A set of programs to assemble and manipulate binary and object files" \
+    ["bison"]="The GNU general-purpose parser generator" \
+    ["fakeroot"]="Gives a fake root environment, useful for building packages as a non-privileged user" \
+    ["flex"]="A tool for generating text-scanning programs" \
+    ["gcc"]="The GNU Compiler Collection - C and C++ frontends" \
+    ["libtool"]="A generic library support script" \
+    ["m4"]="The GNU macro processor" \
+    ["make"]="GNU make utility to maintain groups of programs" \
+    ["patch"]="A utility to apply patch files to original sources" \
+    ["yaourt"]="A pacman wrapper with extended features and AUR support")
+aurapps=("${!aurdesc[@]}")
+
 install_aur() {
+    declare -A aurlist
+    for app in "${aurapps[@]}"; do
+        aurlist[$app]=
+    done
+
     print_title " > Install Drivers > AUR Support\n"
     printf '%b\n' "This option will install the necessary packages required to properly install\npackages available in the AUR. Most of these belong to the base-devel group and\nare required for compiling them. Yaourt will be installed as AUR helper.\n"
-    install_check sudo pacman -S autoconf automake binutils bison fakeroot flex gcc libtool m4 make patch yaourt
+    printf '%b ' "Packages listed for installation: ${!aurlist[@]}"
+    printf '\n\n'
+    while true; do
+        read -s -n 1 -p "Do you want edit this list? [y/N] " yesno
+        if [[ $yesno = [Yy] ]]; then
+            clear
+            while true; do
+                print_title " > Install Drivers > AUR Support > AUR Packages\n"
+                printf '%b\n' "Select the correct number to remove a selection.\n\n0.   Install packages\n"
+                select opt in "${!aurlist[@]}"; do
+                    case "$REPLY" in
+                        0)  quitcat=1; echo; break
+                            ;;
+                        *)  (( REPLY > ${#aurlist[@]} )) && echo "Invalid Option" && continue
+                            in_array "$opt" "${!aurlist[@]}" && unset aurlist[$opt]
+                            clear; break
+                            ;;
+                    esac
+                done
+                (( quitcat == 1 )) && quitcat=0 && break
+            done
+            break
+        elif [[ $yesno = [Nn] || $yesno = "" ]]; then
+            printf '\n\n'
+            break
+        else
+            echo "Invalid option"
+            continue
+        fi
+    done
+    install_check sudo pacman -S "${!aurlist[@]}"
+    unset aurlist
 }
 
 install_graphics() {
@@ -381,14 +440,6 @@ installedcheck() {
             installedlist[$app]=
         fi
     done
-}
-
-in_array() {
-    local i
-    for i in "${@:2}"; do
-        [[ $i = $1 ]] && return 0
-    done
-    return 1
 }
 
 installapps() {
