@@ -29,6 +29,7 @@ manjaro-alsa
 manjaro-artwork
 adwaita-manjaro-themes
 xcursor-vanilla-dmz-aa
+faenza-cupertino-icon-theme # Local repo (AUR)
 
 ## Base Packages
 awesome
@@ -45,7 +46,6 @@ infinality-bundle # Custom repo (infinality-bundle)
 >x86_64 infinality-bundle-multilib # Custom repo (infinality-bundle-multilib)
 ibfonts-meta-base # Custom repo (infinality-bundle-fonts)
 postinstall # Local repo (Own package)
-faenza-blue-dark # Local repo (Gnome-Look: http://gnome-look.org/content/show.php/?content=136508)
 conky
 network-manager-applet
 clipit

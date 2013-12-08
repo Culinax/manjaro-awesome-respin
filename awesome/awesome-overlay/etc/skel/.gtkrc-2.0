@@ -1,5 +1,5 @@
 gtk-theme-name="Adwaita-Manjaro-dark"
-gtk-icon-theme-name="Faenza-Blue-Dark"
+gtk-icon-theme-name="Faenza-Cupertino"
 gtk-font-name="Sans 10"
 gtk-cursor-theme-name="Vanilla-DMZ-AA"
 gtk-cursor-theme-size=0
@@ -12,4 +12,3 @@ gtk-enable-input-feedback-sounds=1
 gtk-xft-antialias=1
 gtk-xft-hinting=1
 gtk-xft-hintstyle="hintfull"
-
