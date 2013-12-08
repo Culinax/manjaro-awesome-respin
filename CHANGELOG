@@ -1,5 +1,18 @@
 Changelog
 
+0.8.8-b4 (08/12/2013)
+    Added lain, awesome-freedesktop, urxvt-perls, audacious, ufw, mpd, ncmpcpp
+    Thunar replaced by SpaceFM, feh replaced by sxiv, slock replaced by slimlock
+    Removed Transmission-GTK, multimedia support, AUR support
+    Drivers can now be installed from the Post Installation Script
+    Increased Infinality rendering with patched fonts
+    Use testing repositories by default
+    Added Vanilla DMZ AA as cursor theme, changed icon theme to Faenza-Cupertino
+    Show calendar when hovering date/time
+    Interactive volume widget, battery widget with notification
+    Fixed Conky and rephrase some text
+    Fixed suspend and hibernation in oblogout
+
 0.8.8rc1-b3 (28/10/2013)
     Default shell changed to zsh
     Infinality font rendering
