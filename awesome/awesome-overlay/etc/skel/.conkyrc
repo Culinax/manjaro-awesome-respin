@@ -50,7 +50,7 @@ ${color1}KEYBINDINGS${hr}
 ${color2}Mod4+p${color3}${alignr}Dmenu
 ${color2}Mod4+Return${color3}${alignr}Terminal
 ${color2}Mod4+d${color3}${alignr}Dwb
-${color2}Mod4+t${color3}${alignr}Thunar
+${color2}Mod4+t${color3}${alignr}SpaceFM
 
 ${color2}Mod4+j${color3}${alignr}Focus Next
 ${color2}Mod4+k${color3}${alignr}Focus Previous

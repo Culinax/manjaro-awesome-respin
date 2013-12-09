@@ -199,7 +199,7 @@ documentation() {
 	    Mod4 + d
 	        dwb (web browser)
 	    Mod4 + t
-	        Thunar (file manager)
+	        SpaceFM (file manager)
 	
 	Switch to specific layout (compared to Mod4 + Space which iterates over all of them)
 	    Mod4 + Control + f
