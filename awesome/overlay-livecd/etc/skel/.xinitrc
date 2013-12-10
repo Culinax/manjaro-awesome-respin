@@ -29,4 +29,4 @@ xrdb -merge ~/.Xresources
 
 # Window Manager
 /opt/livecd/disable-dpms
-exec "$1"
+exec awesome
