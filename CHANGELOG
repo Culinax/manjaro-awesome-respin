@@ -1,5 +1,9 @@
 Changelog
 
+0.8.8-b4.1 (11/12/2013)
+    Fix SLiM failing to login in liveCD
+    Fix mysterious bug with user UID (solved by itself)
+
 0.8.8-b4 (08/12/2013)
     Added lain, awesome-freedesktop, urxvt-perls, audacious, ufw, mpd, ncmpcpp
     Thunar replaced by SpaceFM, feh replaced by sxiv, slock replaced by slimlock
