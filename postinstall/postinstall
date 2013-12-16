@@ -371,7 +371,6 @@ install_aur() {
     done
 
     install_check sudo pacman -S "${!aurlist[@]}"
-    unset aurlist
 }
 
 install_graphics() {
@@ -435,7 +434,6 @@ install_media(){
     done
 
     install_check sudo pacman -S "${!medialist[@]}"
-    unset medialist
 }
 
 printerapps=("cups" "ghostscript" "gsfonts" "cups-pdf" "foomatic-db" "foomatic-db-engine" "foomatic-db-nonfree" "foomatic-filters" "gutenprint" "splix" "hplip")
@@ -482,7 +480,6 @@ install_printer(){
     install_check sudo pacman -S "${!printerlist[@]}"
     systemctl enable cups
     systemctl start cups
-    unset printerlist
 }
 
 
@@ -492,13 +489,14 @@ install_printer(){
 declare -A applist installedlist
 
 installedcheck() {
+    pacman_query="$(pacman -Qq)"
     for app in "${calapps[@]}" "${cddvdapps[@]}" "${chatapps[@]}" "${emailapps[@]}"\
         "${graphicapps[@]}" "${imgviewapps[@]}" "${ircapps[@]}" "${fileapps[@]}"\
         "${thunarapps[@]}" "${pcmanfmapps[@]}" "${nautilusapps[@]}" "${musicapps[@]}"\
         "${mpdapps[@]}" "${officeapps[@]}" "${pdfapps[@]}" "${rssapps[@]}" "${sysmonapps[@]}"\
         "${termapps[@]}" "${textapps[@]}" "${torrentapps[@]}" "${utilapps[@]}"\
         "${videoapps[@]}" "${webapps[@]}"; do
-        if pacman -Qq ${app,,} &>/dev/null; then
+        if printf '%s\n' "$pacman_query" | grep -q ^${app,,}$; then
             applist[$app]=
             installedlist[$app]=
         fi
