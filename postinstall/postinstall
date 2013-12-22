@@ -9,7 +9,7 @@
 #
 # Written by Culinax
 
-source "${0%/*}/postinstalldata.sh"
+source "${0%/*}/postinstall-data.sh"
 
 PS3="> "
 
