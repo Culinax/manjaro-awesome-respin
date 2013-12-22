@@ -1,86 +1,205 @@
 #!/bin/bash
 #
-# postinstall-0.2.1  -  Post Installation Script
+# postinstall-0.3  -  Post Installation Script
 #
-# Post Installation Script is a script which is developed for Manjaro awesome WM
-# respin, codenamed: Cesious. It's purpose is to provide an easy way for users
-# to set up their system, get used to the keybindings and download and install
-# applications.
+# Post Installation Script is a script which is developed for Manjaro Awesome
+# WM respin, codenamed: Cesious. It's purpose is to provide an easy way for
+# users to set up their system, get used to the keybindings, install drivers
+# and download and install applications.
 #
 # Written by Culinax
 
+source "${0%/*}/postinstalldata.sh"
+
 PS3="> "
-normal=$(tput sgr0)
-bold=$(tput bold)
-blue='\e[0;34m'
-title="$blue""$bold"
+
+in_array() {
+    local i
+    for i in "${@:2}"; do
+        [[ $i = "$1" ]] && return 0
+    done
+    return 1
+}
+
+slct() {
+    if in_array "--" "$@"; then
+        declare -A subopts subtitles
+        local sub subtitle subopt
+        until [[ $1 = "--" ]]; do
+            IFS=: read -r sub subtitle subopt<<< "$1"
+            subopts[$sub]=$subopt
+            subtitles[$sub]=$subtitle
+            shift
+        done
+        shift
+    fi
+
+    local title=$1
+    shift
+
+    local indent=0
+    for app in "$@"; do
+        (( ${#app} > indent )) && indent=${#app}
+    done
+
+    while true; do
+        local idx=1
+        print_title "$title"
+        printf '%s\n' "Select the correct number to either enable or disable a selection. Applications"\
+                      "marked with an * will be installed/reinstalled. Applications that are not marked"\
+                      "will not be installed or will be removed."
+        printf '\n%s\n\n' "0.    Proceed to next step"
+        for app in "$@"; do
+            printf "%-$((${##}+1))s %s %-${indent}s │ %s\n" "${idx}." "${work_list[${app}]:- }" "$app" "${apps_descr[$app]}"
+            ((idx++))
+        done
+        echo
+        while true; do
+            read -e -n ${##} -p "$PS3" REPLY
+
+            if [[ $REPLY != [0-9]* ]]; then
+                echo "Invalid option"
+                continue
+            elif (( 10#$REPLY == 0 )); then
+                local quitslct=1
+                clear
+                break
+            elif (( 10#$REPLY >= 1 && 10#$REPLY <= $# )); then
+                opt=${!REPLY}
+                if in_array "${opt}" "${!work_list[@]}"; then
+                    unset work_list[${opt}]
+                    if in_array "$opt" "${!subopts[@]}"; then
+                        for app in ${subopts[$opt]}; do
+                            if in_array "$app" "${!work_list[@]}"; then
+                                unset work_list[$app]
+                            fi
+                        done
+                    fi
+                else
+                    work_list[${opt}]="*"
+                    if in_array "$opt" "${!subopts[@]}"; then
+                        clear
+                        slct "$title > ${subtitles[$opt]}" ${subopts[$opt]}
+                    fi
+                fi
+                clear
+                break
+            else
+                echo "Invalid option"
+                continue
+            fi
+        done
+        (( quitslct == 1 )) && quitslct=0 && break
+    done
+}
+
+process_selections() {
+    local installation=() removal=()
+    for app in "${!work_list[@]}"; do
+        if ! in_array "${app}" "${!installed_list[@]}"; then
+            installation+=("${app,,}")
+        fi
+    done
+
+    clear
+    print_title "$1 > Installing"
+    if (( ${#installation[@]} == 0 )); then
+        printf '%s\n\n' "No applications listed for installation. Press [Return] to finish."
+        while true; do
+            read -s -n 1 -p "$PS3" input
+            if [[ $input = "" ]]; then
+                break
+            else
+                echo "Press [Return] to finish"
+                continue
+            fi
+        done
+    else
+        if install_check i sudo pacman -S "${installation[@]}"; then
+            for app in "${installation[@]}"; do
+                installed_list[$app]=
+            done
+        fi
+    fi
+
+    for app in "${!installed_list[@]}"; do
+        if ! in_array "${app}" "${!work_list[@]}"; then
+            removal+=("${app,,}")
+        fi
+    done
+
+    clear
+    print_title "$1 > Removing"
+    if (( ${#removal[@]} == 0 )); then
+        printf '%s\n\n' "No applications listed for removal. Press [Return] to finish."
+        while true; do
+            read -s -n 1 -p "$PS3" input
+            if [[ $input = "" ]]; then
+                break
+            else
+                echo "Press [Return] to finish"
+                continue
+            fi
+        done
+    else
+        if install_check r sudo pacman -Rns "${removal[@]}"; then
+            for app in "${removal[@]}"; do
+                unset installed_list[$app]
+            done
+        fi
+    fi
+}
+
+install_check() {
+    if [[ $1 = "i" ]]; then
+        local todo="Installation"
+    elif [[ $1 = "r" ]]; then
+        local todo="Removal"
+    fi
+
+    if "${@:2}"; then
+        while true; do
+            printf '\n%s\n\n' "$todo finished successfully. Press [Return] to finish."
+            while true; do
+                read -s -n 1 -p "$PS3" input
+                if [[ $input = "" ]]; then
+                    return 0
+                else
+                    echo "Press [Return] to finish"
+                    continue
+                fi
+            done
+            break
+        done
+    else
+        while true; do
+            printf '%b\n' "\nIt seems like an error occured. Please analyze the output carefully to solve the problem."\
+                          "Press [Return] to finish.\n"
+            while true; do
+                read -s -n 1 -p "$PS3" input
+                if [[ $input = "" ]]; then
+                    return 1
+                else
+                    echo "Press [Return] to finish"
+                    continue
+                fi
+            done
+            break
+        done
+    fi
+}
 
 print_title() {
-    printf "${title}Post Installation Script$@${normal}\n"
+    printf "\033[1;34mPost Installation Script%s\033[0m\n\n" "$@"
 }
 
 print_main() {
-    echo "
-Welcome to Manjaro awesome WM Respin, codenamed: Cesious!
-
-The purpose of this Post Installation Script is to automate common tasks which
-should help you to get you started using your brand new installation.
-
-It is by no means mandatory to run this script, however it is recommended to go
-throught this script once, as it is a very helpful addition. It is recommended
-to start from the first step and then work your way down.
-"
-}
-
-print_cats() {
-    main_opts=("Quick awesome WM starting guide (description + mouse/keybindings)"\
-               "Manjaro specific keybindings"\
-               "Rank mirrorlist, sync to the repositories and update the system"\
-               "Install drivers"\
-               "Install applications sorted by category"\
-               "Never display at boot again"\
-               "Quit")
-    idx=1
-    for i in "${main_opts[@]}"; do
-        if [[ ${i%% *} = "Never" ]]; then
-            echo "r. $i"
-        elif [[ ${i%% *} = "Quit" ]]; then
-            echo "q. $i"
-        else
-            echo "${idx}. $i"
-        fi
-        (( idx++ ))
-    done
-    echo
-}
-
-welcome() {
-    clear
-    print_title
-    print_main
-    echo "\
-It is necessary for this script that an internet conncetion is available. Please
-make sure that you have a working connection before you continue. Press [Return]
-to perform a connection check.
-"
-    installedcheck
-    while true; do
-        read -s -n 1 -p "> " input
-        if [[ $input = "" ]]; then
-            if ping -q -w 1 -c 1 8.8.8.8 &> /dev/null; then
-                echo "Connection check succeeded..."
-                sleep 1
-                main
-            else
-                echo "Connection check failed... Please connect to the internet and press [Return] to
-  run a connection check again"
-                continue
-            fi
-        else
-            echo "Press [Return] to run a connection check"
-            continue
-        fi
-    done
+    printf '%b\n' "Welcome to Manjaro awesome WM Respin, codenamed: Cesious!\n"\
+                  "The purpose of this Post Installation Script is to automate common tasks which"\
+                  "should help you to get you started using your brand new installation.\n"\
+                  "It is by no means mandatory to run this script, however it is recommended to go"\
+                  "throught this script once, as it is a very helpful addition. It is recommended"\
+                  "to start from the first step and then work your way down."
 }
 
 main() {
@@ -88,9 +207,15 @@ main() {
         clear
         print_title
         print_main
-        print_cats
+        printf '%b\n' "\n1. Quick Awesome WM starting guide (description + mouse/keybindings)"\
+                      "2. Manjaro specific keybindings"\
+                      "3. Rank mirrorlist, verifying keyrings, sync to the repositories and update"\
+                      "4. Install drivers"\
+                      "5. Install applications sorted by category"\
+                      "r. Never display at boot again"\
+                      "q. Quit\n"
         while true; do
-            read -s -n 1 -p "> " REPLY
+            read -s -n 1 -p "$PS3" REPLY
             case "$REPLY" in
                 1)  man awesome
                     clear
@@ -102,26 +227,30 @@ main() {
                     break
                     ;;
                 3)  clear
-                    ranksyncupdate && synced=1
+                    rank_sync_update && synced=1
                     clear
                     break
                     ;;
-                4)  (( ! synced == 1 )) && { printf '%b\n' "Please run the third option first to avoid breaking your system due to partial\n  updates."; continue; }
+                4)  if (( synced == 0 )); then
+                        printf '%s\n' "Please run the third option first to avoid breaking your system due to partial"\
+                                      "  updates"
+                        continue
+                    fi
                     clear
                     install_drivers
                     clear
                     break
                     ;;
                 5)  clear
-                    installapps
+                    install_apps
                     clear
                     break
                     ;;
-                r)  removefromstartup
+                r)  remove_from_startup
                     ;;
                 q)  quit
                     ;;
-                *)  echo "Invalid Option"
+                *)  echo "Invalid option"
                     continue
                     ;;
             esac
@@ -129,172 +258,44 @@ main() {
     done
 }
 
-
-
-# "GLOBAL" FUNCTIONS ###########################################################
-
-
-in_array() {
-    local i
-    for i in "${@:2}"; do
-        [[ $i = $1 ]] && return 0
-    done
-    return 1
-}
-
-install_check() {
-    if "$@"; then
-        while true; do
-            printf '%b\n' "\nInstallation finished successfully. Press [Return] to finish.\n"
-            while true; do
-                read -s -n 1 -p "> " input
-                if [[ $input = "" ]]; then
-                    break
-                else
-                    echo "Press [Return] to finish"
-                    continue
-                fi
-            done
-            break
-        done
-
-    else
-        while true; do
-            printf '%b\n' "\nIt seems like an error occured. Please analyze the output carefully to solve the problem. Press [Return] to finish.\n"
-            while true; do
-                read -s -n 1 -p "> " input
-                if [[ $input = "" ]]; then
-                    break
-                else
-                    echo "Press [Return] to finish"
-                    continue
-                fi
-            done
-            break
-        done
-    fi
-}
-
-
-
-# OPTION SPECIFIC KEYBINDINGS ##################################################
-
-
-#TODO# Write a quick user guide with keybindings + a more lengthy one for people who want to take the most out of their WM, describing configuration options etc. #TODO#
-documentation() {
-	cat <<-EOF
-	List of added (non-default) keybindings. For default keybindings you can read the manpage of awesome.
-	
-	Basic keys
-	    Mod4 + Shift + q
-	        OBLogout
-	    Mod4 + p
-	        dmenu
-	    Mod4 + b
-	        Toggle wibox visibilaty
-	    Mod4 + Shift + l
-	        Lock the screen (slock)
-	
-	Applications
-	    Mod4 + d
-	        dwb (web browser)
-	    Mod4 + t
-	        SpaceFM (file manager)
-	
-	Switch to specific layout (compared to Mod4 + Space which iterates over all of them)
-	    Mod4 + Control + f
-	        Floating Mode
-	    Mod4 + Control + t
-	        Tiling Mode
-	    Mod4 + Control + b
-	        Bottom Stack
-	    Mod4 + Control + s
-	        Fair
-	    Mod4 + Control + m
-	        Maximized
-	
-	Volume Control
-	    XF86AudioRaiseVolume
-	        Raise volume (ALSA) while spawning Volnoti to show the current volume
-	    XF86AudioLowerVolume
-	        Lower volume (ALSA) while spawning Volnoti to show the current volume
-	    XF86AudioMute
-	        Toggle mute (ALSA) while spawning Volnoti to show the current volume
-	
-	Brightness Control
-	    XF86MonBrightnessUp
-	        Raise brightnesss while spawning Volnoti to show the current brightness
-	    XF86MonBrightnessDown
-	        Lower brightness while spawning Volnoti to show the current brightness
-	
-	PrintScreen
-	    Print
-	        Take a screenshot of the whole screen (scrot)
-	    Shift + Print
-	        Take a screenshot of a windows (scrot)
-	EOF
-}
-
-
-
-# OPTION RANK SYNC UPDATE ######################################################
-
-
-#TODO# Maybe break the function when a command fails? #TODO#
-ranksyncupdate(){
+rank_sync_update(){
     print_title " > Rank Sync Update"
-    echo
 
     sudo pacman-key --init
     sudo pacman-key --populate archlinux manjaro
     if sudo pacman-key -r 962DDE58 && sudo pacman-key --lsign-key 962DDE58; then
-        idx=1
+        local idx=1
         linenum=()
         while read -r line; do
             if [[ $line = "[infinality-bundle"* ]]; then
-                repo=1
+                local repo=1
             elif [[ $repo = 1 && $line = SigLevel* ]]; then
                 linenum+=($idx)
-                repo=0
+                local repo=0
             fi
             (( idx++ ))
         done < "/etc/pacman.conf"
         
         for (( idx=${#linenum[@]}-1; idx>=0; idx-- )); do
-            sed -i "${linenum[idx]}d" /etc/pacman.conf
+            sudo sed -i "${linenum[idx]}d" /etc/pacman.conf
         done
     fi
     sudo pacman-mirrors -g
     sudo pacman -Syy manjaro-system pacman --needed 2>/dev/null
-    install_check sudo pacman -Su
+    install_check i sudo pacman -Su
 }
-
-
-
-# OPTION INSTALL DRIVERS #######################################################
-
 
 install_drivers() {
     while true; do
-        print_title " > Install Drivers\n"
-        printf '%b\n' "Select the correct number of the driver you want to install.\n"
-        driver_opts=("AUR support"\
-                     "Graphics driver"\
-                     "Multimedia support"\
-                     "Printer drivers"\
-                     "Quit")
-        idx=1
-        for i in "${driver_opts[@]}"; do
-            if [[ ${i%% *} = "Quit" ]]; then
-                echo "q. $i"
-            else
-                echo "${idx}. $i"
-            fi
-            (( idx++ ))
-        done
-        echo
+        print_title " > Install Drivers"
+        printf '%b\n' "Select the correct number of the driver you want to install.\n"\
+                      "1. AUR support"\
+                      "2. Graphics driver"\
+                      "3. Multimedia support"\
+                      "4. Printer drivers"\
+                      "q. Quit\n"
         while true; do
-            read -s -n 1 -p "> " REPLY
+            read -s -n 1 -p "$PS3" REPLY
             case "$REPLY" in
                 1)  clear
                     install_aur
@@ -329,60 +330,36 @@ install_drivers() {
     done
 }
 
-aurapps=("autoconf" "automake" "binutils" "bison" "fakeroot" "flex" "gcc" "libtool" "m4" "make" "patch" "yaourt")
-
 install_aur() {
-    declare -A aurlist
-    for app in "${aurapps[@]}"; do
-        aurlist[$app]=
+    for app in "${apps_aur[@]}"; do
+        work_list[$app]="*"
     done
 
-    print_title " > Install Drivers > AUR Support\n"
-    printf '%b\n' "This option will install the necessary packages required to properly install\npackages available in the AUR. Most of these belong to the base-devel group and\nare required for compiling them. Yaourt will be installed as AUR helper.\n"
-    printf '%b ' "Packages listed for installation: ${!aurlist[@]}"
-    printf '\n\n'
-    while true; do
-        read -s -n 1 -p "Do you want edit this list? [y/N] " yesno
-        if [[ $yesno = [Yy] ]]; then
-            clear
-            while true; do
-                print_title " > Install Drivers > AUR Support > AUR Packages\n"
-                printf '%b\n' "Select the correct number to remove a selection.\n\n0.   Install packages\n"
-                select opt in "${!aurlist[@]}"; do
-                    case "$REPLY" in
-                        0)  quitcat=1; echo; break
-                            ;;
-                        *)  (( REPLY > ${#aurlist[@]} )) && echo "Invalid Option" && continue
-                            in_array "$opt" "${!aurlist[@]}" && unset aurlist[$opt]
-                            clear; break
-                            ;;
-                    esac
-                done
-                (( quitcat == 1 )) && quitcat=0 && break
-            done
-            break
-        elif [[ $yesno = [Nn] || $yesno = "" ]]; then
-            printf '\n\n'
-            break
-        else
-            echo "Invalid option"
-            continue
-        fi
-    done
-
-    install_check sudo pacman -S "${!aurlist[@]}"
+    local subtitle=" > Install Drivers > AUR Support"
+    slct "$subtitle" "${apps_aur[@]}"
+    process_selections "$subtitle"
 }
 
 install_graphics() {
-    print_title " > Install Drivers > Graphics Driver\n"
-    printf '%b\n' "This option will install the correct graphics driver with the help of the\nManjaro Hardware Detection tool. MHWD automatically detects your graphics card\nand installs the proper drivers for it. Please enter the correct number,\ndepending whether you want the open-source (free) or the proprietary (non-free)\ndrivers.\n\n1. Open-source drivers (free)\n2. Proprietary drivers (non-free)\n"
+    print_title " > Install Drivers > Graphics Driver"
+    printf '%b\n' "This option will install the correct graphics driver with the help of the"\
+                  "Manjaro Hardware Detection tool. MHWD automatically detects your graphics card"\
+                  "and installs the proper drivers for it. Please enter the correct number,"\
+                  "depending whether you want the open-source (free) or the proprietary (non-free)"\
+                  "drivers.\n"\
+                  "1. Open-source drivers (free)"\
+                  "2. Proprietary drivers (non-free)\n"
     while true; do
-        read -s -n 1 -p "> " REPLY
+        read -s -n 1 -p "$PS3" REPLY
         case "$REPLY" in
-            1)  install_check sudo mhwd -a pci free 0300
+            1)  clear
+                print_title " > Install Drivers > Graphics Driver > Installing Free"
+                install_check i sudo mhwd -a pci free 0300
                 break
                 ;;
-            2)  install_check sudo mhwd -a pci nonfree 0300
+            2)  clear
+                print_title " > Install Drivers > Graphics Driver > Installing Nonfree"
+                install_check i sudo mhwd -a pci nonfree 0300
                 break
                 ;;
             *)  echo "Invalid Option"
@@ -392,1353 +369,92 @@ install_graphics() {
     done
 }
 
-mediaapps=("gst-libav" "gst-plugins-bad" "gst-plugins-base" "gst-plugins-good" "gst-plugins-ugly" "gstreamer0.10-bad-plugins" "gstreamer0.10-base-plugins" "gstreamer0.10-good-plugins" "gstreamer0.10-ugly-plugins" "flashplugin" "libdvdcss" "icedtea-web-java7")
-
-install_media(){
-    declare -A medialist
-    for app in "${mediaapps[@]}"; do
-        medialist[$app]=
+install_media() {
+    for app in "${apps_media[@]}"; do
+        work_list[$app]="*"
     done
 
-    print_title " > Install Drivers > Multimedia Support\n"
-    printf '%b\n' "This option will install the packages necessary for full multimedia support.\nThis includes codecs, dvd decryption and flashplayer.\n"
-    printf '%b ' "Packages listed for installation: ${!medialist[@]}"
-    printf '\n\n'
-    while true; do
-        read -s -n 1 -p "Do you want edit this list? [y/N] " yesno
-        if [[ $yesno = [Yy] ]]; then
-            clear
-            while true; do
-                print_title " > Install Drivers > Multimedia Support > Multimedia Packages\n"
-                printf '%b\n' "Select the correct number to remove a selection.\n\n0.   Install packages\n"
-                select opt in "${!medialist[@]}"; do
-                    case "$REPLY" in
-                        0)  quitcat=1; echo; break
-                            ;;
-                        *)  (( REPLY > ${#medialist[@]} )) && echo "Invalid Option" && continue
-                            in_array "$opt" "${!medialist[@]}" && unset medialist[$opt]
-                            clear; break
-                            ;;
-                    esac
-                done
-                (( quitcat == 1 )) && quitcat=0 && break
-            done
-            break
-        elif [[ $yesno = [Nn] || $yesno = "" ]]; then
-            printf '\n\n'
-            break
-        else
-            echo "Invalid option"
-            continue
-        fi
-    done
-
-    install_check sudo pacman -S "${!medialist[@]}"
+    local subtitle=" > Install Drivers > AUR Support"
+    slct "$subtitle" "${apps_media[@]}"
+    process_selections "$subtitle"
 }
 
-printerapps=("cups" "ghostscript" "gsfonts" "cups-pdf" "foomatic-db" "foomatic-db-engine" "foomatic-db-nonfree" "foomatic-filters" "gutenprint" "splix" "hplip")
-
-install_printer(){
-    declare -A printerlist
-    for app in "${printerapps[@]}"; do
-        printerlist[$app]=
+install_printer() {
+    for app in "${apps_printer[@]}"; do
+        work_list[$app]="*"
     done
 
-    print_title " > Install Drivers > Printer Drivers\n"
-    printf '%b\n' " This option will install the drivers necessary for printing. This list contains\n several different drivers for different kinds of printer brands. If you don't\n want those, then you can edit the list of packages.\n "
-    printf '%b ' "Packages listed for installation: ${!printerlist[@]}"
-    printf '\n\n'
-    while true; do
-        read -s -n 1 -p "Do you want edit this list? [y/N] " yesno
-        if [[ $yesno = [Yy] ]]; then
-            clear
-            while true; do
-                print_title " > Install Drivers > Printer Drivers > Printer Packages\n"
-                printf '%b\n' "Select the correct number to remove a selection.\n\n0.   Install packages\n"
-                select opt in "${!printerlist[@]}"; do
-                    case "$REPLY" in
-                        0)  quitcat=1; echo; break
-                            ;;
-                        *)  (( REPLY > ${#printerlist[@]} )) && echo "Invalid Option" && continue
-                            in_array "$opt" "${!printerlist[@]}" && unset printerlist[$opt]
-                            clear; break
-                            ;;
-                    esac
-                done
-                (( quitcat == 1 )) && quitcat=0 && break
-            done
-            break
-        elif [[ $yesno = [Nn] || $yesno = "" ]]; then
-            printf '\n\n'
-            break
-        else
-            echo "Invalid option"
-            continue
-        fi
-    done
+    local subtitle=" > Install Drivers > Printer Drivers"
+    slct "$subtitle" "${apps_printer[@]}"
+    process_selections "$subtitle"
 
-    install_check sudo pacman -S "${!printerlist[@]}"
     systemctl enable cups
     systemctl start cups
 }
 
-
-# OPTION INSTALL APPS BY CATEGORY ##############################################
-
-
-declare -A applist installedlist
-
-installedcheck() {
-    pacman_query="$(pacman -Qq)"
-    for app in "${calapps[@]}" "${cddvdapps[@]}" "${chatapps[@]}" "${emailapps[@]}"\
-        "${graphicapps[@]}" "${imgviewapps[@]}" "${ircapps[@]}" "${fileapps[@]}"\
-        "${thunarapps[@]}" "${pcmanfmapps[@]}" "${nautilusapps[@]}" "${musicapps[@]}"\
-        "${mpdapps[@]}" "${officeapps[@]}" "${pdfapps[@]}" "${rssapps[@]}" "${sysmonapps[@]}"\
-        "${termapps[@]}" "${textapps[@]}" "${torrentapps[@]}" "${utilapps[@]}"\
-        "${videoapps[@]}" "${webapps[@]}"; do
-        if printf '%s\n' "$pacman_query" | grep -q ^${app,,}$; then
-            applist[$app]=
-            installedlist[$app]=
-        fi
-    done
-}
-
-installapps() {
-    cal_cat
-    cddvd_cat
-    chat_cat
-    email_cat
-    graphic_cat
-    imgview_cat
-    irc_cat
-    file_cat
-    music_cat
-    office_cat
-    pdf_cat
-    rss_cat
-    sysmon_cat
-    term_cat
-    text_cat
-    torrent_cat
-    util_cat
-    video_cat
-    web_cat
-
-    list_install
-    list_remove
-    (( skip_install != 1 )) && install_apps
-    (( skip_remove != 1 )) && remove_apps
-}
-
-list_install() {
-#TODO# Make a more extensive menu similar to the categories where you can enable/disable | If possible #TODO#
-    if (( ${#applist[@]} != 0 )); then
-        while true; do
-            applistbak=("${!applist[@]}")
-            print_title " > Install Applications > Review Installation List\n"
-            printf '%b\n' "This is a list of applications that you have listed for installation. You can\nreview them here, in case you changed your mind and don't want an application\nanyway. Select the correct number to remove a selection from the installation\nlist.\n\n0.   Proceed to next step\n"
-            select opt in "${!applist[@]}"; do
-                case "$REPLY" in
-                    0)  quitcat=1; clear; break
-                        ;;
-#TODO# [1-"${#applistbak[@]}"]) seems to stop at 7 even though there are higher numbers #TODO#
-                    *)  opt=${applistbak[$REPLY-1]}
-                        (( REPLY > ${#applistbak[@]} )) && echo "Invalid Option" && continue
-                        if in_array "$opt" "${!applist[@]}"; then
-                            unset applist[$opt]
-                        else
-                            applist[$opt]=
-                        fi
-                        clear
-                        break
-                        ;;
-                esac
-            done
-            (( quitcat == 1 )) && quitcat=0 && break
-        done
-
-    else
-        print_title " > Install Applications > Review Installation List\n"
-        printf '%b\n' "No applications are listed for installation. Press [0] to proceed.\n"
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  clear; break
-                    ;;
-                *)  echo "Press [0] to proceed"
-                    ;;
-            esac
-        done
-
-    fi
-
-    installlist=()
-    for app in "${!applist[@]}"; do
-        if ! in_array "$app" "${!installedlist[@]}"; then
-            installlist+=("$app")
-        fi
-    done
-        
-    (( ${#installlist[@]} == 0 )) && skip_install=1
-}
-
-list_remove() {
-    declare -A remlist
-    for app in "${!installedlist[@]}"; do 
-        if ! in_array "$app" "${!applist[@]}"; then
-            remlist[$app]=
-        fi
-    done
-
-#TODO# Make a more extensive menu similar to the categories where you can enable/disable | If possible #TODO#
-    if (( ${#remlist[@]} != 0 )); then
-        while true; do
-            remlistbak=("${!remlist[@]}")
-            print_title " > Install Applications > Review Removal List\n"
-            printf '%b\n' "This is a list of applications that you have listed for removal. You can\nreview them here, in case you changed your mind and don't want to remove an\napplication anyway. Select the correct number to remove a selection from the\nremoval list.\n\n0.   Proceed to next step\n"
-            select opt in "${!remlist[@]}"; do
-                case "$REPLY" in
-                    0)  quitcat=1; clear; break
-                        ;;
-#TODO# [1-"${#applistbak[@]}"]) seems to stop at 7 even though there are higher numbers #TODO#
-                    *)  opt=${remlistbak[$REPLY-1]}
-                        (( REPLY > ${#remlistbak[@]} )) && echo "Invalid Option" && continue
-                        if in_array "$opt" "${!remlist[@]}"; then
-                            unset remlist[$opt]
-                        else
-                            remlist[$opt]=
-                        fi
-                        clear
-                        break
-                        ;;
-                esac
-            done
-            (( quitcat == 1 )) && quitcat=0 && break
-        done
-
-    else
-        print_title " > Install Applications > Review Removal List\n"
-        printf '%b\n' "No applications are listed for removal. Press [0] to proceed.\n"
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  clear; break
-                    ;;
-                *)  echo "Press [0] to proceed"
-                    ;;
-            esac
-        done
-    fi
-
-    removelist=()
-    for app in "${!remlist[@]}"; do
-        removelist+=($app)
-    done
-    (( ${#removelist[@]} == 0 )) && skip_remove=1
-}
-
 install_apps() {
-    clear
-    print_title " > Install Applications > Install Applications\n"
-    install_check sudo pacman -S "${installlist[@],,}"
-}
+    local subtitle=" > Install Applications"
 
-remove_apps() {
-    clear
-    print_title " > Install Applications > Remove Applications\n"
-    if sudo pacman -Rns "${removelist[@],,}"; then
-        printf '%b\n' "\nRemoval finished successfully. Press [Return] to finish.\n"
-        while true; do
-            read -s -n 1 -p "> " input
-            if [[ $input = "" ]]; then
-                break
-            else
-                echo "Press [Return] to finish."
-            fi
-        done
-        for app in "${removelist[@]}"; do
-            unset installedlist[$app]
-        done
-    
-    else
-        printf '%b\n' "\nIt seems like an error occured during the removal. Please analyze the output\ncarefully to solve the problem. Press [Return] to finish.\n"
-        while true; do
-            read -s -n 1 -p "> " input
-            if [[ $input = "" ]]; then
-                break
-            else
-                echo "Press [Return] to finish."
-            fi
-        done
-    fi
+    slct "$subtitle > Calendars" "${apps_cal[@]}"
+    slct "$subtitle > CD/DVD Burners" "${apps_cddvd[@]}"
+    slct "$subtitle > Chat Clients" "${apps_chat[@]}"
+    slct "$subtitle > Email Clients" "${apps_email[@]}"
+    slct "$subtitle > Graphic Manipulation" "${apps_graphic[@]}"
+    slct "$subtitle > Image Viewers" "${apps_imgview[@]}"
+    slct "$subtitle > IRC Clients" "${apps_irc[@]}"
+    slct "Nautilus:Nautilus:${apps_nautilus[*]}"\
+         "PCManFM:PCManFM:${apps_pcmanfm[*]}"\
+         "SpaceFM:SpaceFM:${apps_spacefm[*]}"\
+         "Thunar:Thunar:${apps_thunar[*]}"\
+         -- "$subtitle > File Managers" "${apps_file[@]}"
+    slct "MPD:MPD Clients:${apps_mpd[*]}"\
+         -- "$subtitle > Music Players" "${apps_music[@]}"
+    slct "$subtitle > Office Apps" "${apps_office[@]}"
+    slct "$subtitle > PDF Readers" "${apps_pdf[@]}"
+    slct "$subtitle > RSS Readers" "${apps_rss[@]}"
+    slct "$subtitle > System Monitors" "${apps_sysmon[@]}"
+    slct "$subtitle > Terminal Emulators" "${apps_term[@]}"
+    slct "$subtitle > Text Editors" "${apps_text[@]}"
+    slct "$subtitle > Torrent Clients" "${apps_torrent[@]}"
+    slct "$subtitle > Utilities" "${apps_util[@]}"
+    slct "$subtitle > Video Players" "${apps_video[@]}"
+    slct "$subtitle > Web Browsers" "${apps_web[@]}"
 
-    unset remlist
-}
-
-declare -A caldesc=(\
-    ["calcurse"]="A text-based personal organizer." \
-    ["Wyrd"]="A text-based front-end to Remind.")
-declare -A cddvddesc=(\
-    ["Brasero"]="A disc burning application for Gnome" \
-    ["K3b"]="Feature-rich and easy to handle CD burning application" \
-    ["Xfburn"]="A simple CD/DVD burning tool based on libburnia libraries")
-declare -A chatdesc=(\
-    ["BitlBee"]="Brings instant messaging (XMPP, MSN, Yahoo!, AIM, ICQ, Twitter) to IRC" \
-    ["Pidgin"]="Multi-protocol instant messaging client" \
-    ["Skype"]="P2P software for high-quality voice communication")
-declare -A emaildesc=(\
-    ["Evolution"]="Manage your email, contacts and schedule" \
-    ["Mutt"]="Small but very powerful text-based mail client" \
-    ["Thunderbird"]="Standalone Mail/News reader")
-declare -A graphicdesc=(\
-    ["Blender"]="A fully integrated 3D graphics creation suite" \
-    ["GIMP"]="GNU Image Manipulation Program" \
-    ["ImageMagick"]="An image viewing/manipulation program" \
-    ["Inkscape"]="Vector graphics editor using the SVG file format" \
-    ["Pinta"]="A drawing/editing program modeled after Paint.NET.")
-declare -A imgviewdesc=(\
-    ["feh"]="Fast and light imlib2-based image viewer" \
-    ["GPicView"]="lightweight image viewer" \
-    ["Mirage"]="A simple GTK+ Image Viewer" \
-    ["sxiv"]="Simple X Image Viewer" \
-    ["Viewnior"]="A simple, fast and elegant image viewer program")
-declare -A ircdesc=(\
-    ["HexChat"]="A popular and easy to use graphical IRC (chat) client" \
-    ["Irssi"]="Modular text mode IRC client with Perl scripting" \
-    ["WeeChat"]="Fast, light and extensible IRC client (curses UI)")
-declare -A filedesc=(\
-    ["kdebase-Dolphin"]="File Manager" \
-    ["MC"]="Midnight Commander is a text based filemanager/shell that emulates Norton Commander" \
-    ["Nautilus"]="GNOME file manager" \
-    ["PCManFM"]="An extremely fast and lightweight file manager" \
-    ["ranger"]="A simple, vim-like file manager" \
-    ["SpaceFM"]="Multi-panel tabbed file manager" \
-    ["Thunar"]="Modern file manager for Xfce")
-declare -A spacefmdesc=(\
-    ["udevil"]="Mount as non-root user and mount networks")
-declare -A thunardesc=(\
-    ["GVfs"]="For trash support, mounting with udisk and remote filesystems" \
-    ["Thunar-Archive-Plugin"]="Create and deflate archives" \
-    ["Thunar-Media-Tags-Plugin"]="View/edit id3/ogg tags" \
-    ["Thunar-VolMan"]="Manages removable devices" \
-    ["Tumbler"]="For thumbnail previews")
-declare -A pcmanfmdesc=(\
-    ["GVfs"]="For trash support, mounting with udisk and remote filesystems")
-declare -A nautilusdesc=(\
-    ["Nautilus-Actions"]="Configures programs to be launched when files are selected in Nautilus" \
-    ["Nautilus-Terminal"]="An integrated terminal for Nautilus" \
-    ["Nautilus-Open-Terminal"]="A nautilus plugin for opening terminals in arbitrary local paths" \
-    ["Seahorse-Nautilus"]="PGP encryption and signing for nautilus")
-declare -A musicdesc=(\
-    ["Amarok"]="The powerful music player for KDE" \
-    ["Audacious"]="Lightweight, advanced audio player focused on audio quality" \
-    ["Banshee"]="music management and playback for GNOME" \
-    ["Clementine"]="A music player and library organizer" \
-    ["cmus"]="Very feature-rich ncurses-based music player" \
-    ["DeaDBeeF"]="An audio player for GNU/Linux based on GTK2." \
-    ["MOC"]="An ncurses console audio player designed to be powerful and easy to use" \
-    ["MPD"]="Flexible, powerful, server-side application for playing music" \
-    ["Rhythmbox"]="An iTunes-like music playback and management application")
-declare -A mpddesc=(\
-    ["mpc"]="Minimalist command line interface to MPD" \
-    ["ncmpcpp"]="Almost exact clone of ncmpc with some new features")
-declare -A officedesc=(\
-    ["AbiWord"]="A fully-featured word processor" \
-    ["Calligra"]="Actively developed fork of KOffice, the KDE office suite" \
-    ["Gnumeric"]="A GNOME Spreadsheet Program" \
-    ["LibreOffice"]="A productivity suite that is compatible with other major office suites")
-declare -A pdfdesc=(\
-    ["ePDFView"]="A free lightweight PDF document viewer." \
-    ["Evince"]="Simply a document viewer" \
-    ["MuPDF"]="Lightweight PDF and XPS viewer" \
-    ["Xpdf"]="Viewer for Portable Document Format (PDF) files" \
-    ["zathura-pdf-mupdf"]="Adds pdf support to zathura by using the mupdf library" \
-    ["zathura-pdf-poppler"]="Adds pdf support to zathura by using the poppler engine")
-declare -A rssdesc=(\
-    ["Liferea"]="A desktop news aggregator for online news feeds and weblogs" \
-    ["newsbeuter"]="A RSS feed reader for the text console with special Podcast support")
-declare -A sysmondesc=(\
-    ["Conky"]="Lightweight system monitor for X" \
-    ["htop"]="Interactive process viewer")
-declare -A termdesc=(\
-    ["GNOME-Terminal"]="The GNOME Terminal Emulator" \
-    ["kdebase-Konsole"]="Terminal" \
-    ["LXTerminal"]="VTE-based terminal emulator (part of LXDE)" \
-    ["rxvt-unicode"]="An unicode enabled rxvt-clone terminal emulator (urxvt)" \
-    ["sakura"]="A terminal emulator based on GTK and VTE" \
-    ["Terminator"]="Terminal emulator that supports tabs and grids" \
-    ["Xfce4-Terminal"]="A modern terminal emulator primarly for the Xfce desktop environment" \
-    ["xterm"]="X Terminal Emulator")
-declare -A textdesc=(\
-    ["Emacs"]="The extensible, customizable, self-documenting real-time display editor" \
-    ["Geany"]="Fast and lightweight IDE" \
-    ["gedit"]="A text editor for GNOME" \
-    ["gVim"]="Vi Improved (with features, such as a GUI)" \
-    ["Leafpad"]="A notepad clone for GTK+ 2.0" \
-    ["Vim"]="Vi Improved, a highly configurable, improved version of the vi text editor")
-declare -A torrentdesc=(\
-    ["Deluge"]="A BitTorrent client with multiple use interfaces in a client/server model" \
-    ["rTorrent"]="Ncurses BitTorrent client based on libTorrent" \
-    ["Transmission-CLI"]="Fast, easy, and free BitTorrent client (CLI tools, daemon and web client)" \
-    ["Transmission-GTK"]="Fast, easy, and free BitTorrent client (GTK+ GUI)" \
-    ["Transmission-Remote-CLI"]="Curses interface for the daemon of the BitTorrent client Transmission" \
-    ["Transmission-Qt"]="Fast, easy, and free BitTorrent client (Qt GUI)")
-declare -A utildesc=(\
-    ["BleachBit"]="Deletes unneeded files to free disk space and maintain privacy" \
-    ["ClipIt"]="Lightweight GTK+ clipboard manager (fork of Parcellite)" \
-    ["galculator"]="GTK+ based scientific calculator" \
-    ["Parcellite"]="Lightweight GTK+ clipboard manager" \
-    ["scrot"]="A simple command-line screenshot utility for X" \
-    ["tmux"]="A terminal multiplexer")
-declare -A videodesc=(\
-    ["GNOME-MPlayer"]="A simple MPlayer GUI" \
-    ["MPlayer"]="A movie player for Linux" \
-    ["mpv"]="Video player based on MPlayer/mplayer2" \
-    ["SMPlayer"]="A complete front-end for MPlayer" \
-    ["VLC"]="A multi-platform MPEG, VCD/DVD, and DivX player")
-declare -A webdesc=(\
-    ["Chromium"]="The open-source project behind Google Chrome, an attempt at creating a safer, faster, and more stable browser" \
-    ["dwb"]="A webkit web browser with vi-like keyboard shortcuts, stable snapshot" \
-    ["Firefox"]="Standalone web browser from mozilla.org" \
-    ["luakit"]="Fast, small, webkit based browser framework extensible by Lua" \
-    ["Midori"]="Lightweight web browser based on Gtk WebKit" \
-    ["Opera"]="Fast and secure web browser and Internet suite" \
-    ["Uzbl-Tabbed"]="Tabbing manager providing multiple uzbl-browser instances in 1 window")
-
-calapps=("${!caldesc[@]}")
-cddvdapps=("${!cddvddesc[@]}")
-chatapps=("${!chatdesc[@]}")
-emailapps=("${!emaildesc[@]}")
-graphicapps=("${!graphicdesc[@]}")
-imgviewapps=("${!imgviewdesc[@]}")
-ircapps=("${!ircdesc[@]}")
-fileapps=("${!filedesc[@]}")
-spacefmapps=("${!spacefmdesc[@]}")
-thunarapps=("${!thunardesc[@]}")
-pcmanfmapps=("${!pcmanfmdesc[@]}")
-nautilusapps=("${!nautilusdesc[@]}")
-musicapps=("${!musicdesc[@]}")
-mpdapps=("${!mpddesc[@]}")
-officeapps=("${!officedesc[@]}")
-pdfapps=("${!pdfdesc[@]}")
-rssapps=("${!rssdesc[@]}")
-sysmonapps=("${!sysmondesc[@]}")
-termapps=("${!termdesc[@]}")
-textapps=("${!textdesc[@]}")
-torrentapps=("${!torrentdesc[@]}")
-utilapps=("${!utildesc[@]}")
-videoapps=("${!videodesc[@]}")
-webapps=("${!webdesc[@]}")
-
-cal_cat() {
-    while true; do
-        print_title " > Install Applications > Calendars\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${calapps[@]}"; do
-            desc="${caldesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-9s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#calapps[@]}])
-                    opt=${calapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
+    local installation=() removal=()
+    for app in "${!work_list[@]}"; do
+        if ! in_array "${app}" "${!installed_list[@]}"; then
+            installation+=("$app")
+        fi
     done
-}
+    (( ${#installation[@]} != 0 )) && slct "$subtitle > Review Installation List" "${installation[@]}"
 
-cddvd_cat() {
-    while true; do
-        print_title " > Install Applications > CD/DVD Burners\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${cddvdapps[@]}"; do
-            desc="${cddvddesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#cddvdapps[@]}])
-                    opt=${cddvdapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
+    for app in "${!installed_list[@]}"; do
+        if ! in_array "${app}" "${!work_list[@]}"; then
+            removal+=("$app")
+        fi
     done
+    (( ${#removal[@]} != 0 )) && slct "$subtitle > Review Removal List" "${removal[@]}"
+
+    process_selections "$subtitle"
 }
 
-chat_cat() {
-    while true; do
-        print_title " > Install Applications > Chat Clients\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${chatapps[@]}"; do
-            desc="${chatdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#chatapps[@]}])
-                    opt=${chatapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-email_cat() {
-    while true; do
-        print_title " > Install Applications > Email Clients\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${emailapps[@]}"; do
-            desc="${emaildesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-12s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#emailapps[@]}])
-                    opt=${emailapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-graphic_cat() {
-    while true; do
-        print_title " > Install Applications > Graphic Manipulation\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${graphicapps[@]}"; do
-            desc="${graphicdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-12s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#graphicapps[@]}])
-                    opt=${graphicapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-imgview_cat() {
-    while true; do
-        print_title " > Install Applications > Image Viewers\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${imgviewapps[@]}"; do
-            desc="${imgviewdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-9s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#imgviewapps[@]}])
-                    opt=${imgviewapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-irc_cat() {
-    while true; do
-        print_title " > Install Applications > IRC Clients\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${ircapps[@]}"; do
-            desc="${ircdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#ircapps[@]}])
-                    opt=${ircapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-file_cat() {
-    while true; do
-        print_title " > Install Applications > File Managers\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${fileapps[@]}"; do
-            desc="${filedesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-16s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#fileapps[@]}])
-                    clear
-                    opt=${fileapps[$REPLY-1]}
-#TODO# GVfs is common between Thunar and PCManFM, but when e.g. PCManFM is removed and Thunar is not, GVfs is removed anyway. #TODO#
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                        if [[ $opt = "SpaceFM" ]]; then
-                            for app in "${spacefmapps[@]}"; do
-                                if in_array "$app" "${!applist[@]}"; then
-                                    unset applist[$app]
-                                fi
-                            done
-                        elif [[ $opt = "Thunar" ]]; then
-                            for app in "${thunarapps[@]}"; do
-                                if in_array "$app" "${!applist[@]}"; then
-                                    unset applist[$app]
-                                fi
-                            done
-                        elif [[ $opt = "PCManFM" ]]; then
-                            for app in "${pcmanfmapps[@]}"; do
-                                if in_array "$app" "${!applist[@]}"; then
-                                    unset applist[$app]
-                                fi
-                            done
-                        elif [[ $opt = "Nautilus" ]]; then
-                            for app in "${nautilusapps[@]}"; do
-                                if in_array "$app" "${!applist[@]}"; then
-                                    unset applist[$app]
-                                fi
-                            done
-                        fi
-                    else
-                        applist[$opt]=
-                        if [[ $opt = "SpaceFM" ]]; then
-                            spacefm_cat
-                        elif [[ $opt = "Thunar" ]]; then
-                            thunar_cat
-                        elif [[ $opt = "PCManFM" ]]; then
-                            pcmanfm_cat
-                        elif [[ $opt = "Nautilus" ]]; then
-                            nautilus_cat
-                        fi
-                    fi
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-spacefm_cat() {
-    while true; do
-        print_title " > Install Applications > File Managers > SpaceFM\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${spacefmapps[@]}"; do
-            desc="${spacefmdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-7s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#spacefmapps[@]}])
-                    opt=${spacefmapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-thunar_cat() {
-    while true; do
-        print_title " > Install Applications > File Managers > Thunar\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${thunarapps[@]}"; do
-            desc="${thunardesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-25s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#thunarapps[@]}])
-                    opt=${thunarapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-pcmanfm_cat() {
-    while true; do
-        print_title " > Install Applications > File Managers > PCManFM\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${pcmanfmapps[@]}"; do
-            desc="${pcmanfmdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-5s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#pcmanfmapps[@]}])
-                    opt=${pcmanfmapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-nautilus_cat() {
-    while true; do
-        print_title " > Install Applications > File Managers > Nautilus\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${nautilusapps[@]}"; do
-            desc="${nautilusdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-23s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#nautilusapps[@]}])
-                    opt=${nautilusapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat = 1 )) && quitcat=0 && break
-    done
-}
-
-music_cat() {
-    while true; do
-        print_title " > Install Applications > Music Players\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${musicapps[@]}"; do
-            desc="${musicdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-11s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#musicapps[@]}])
-                    clear
-                    opt=${musicapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                        if [[ $opt = "MPD" ]]; then
-                            for app in "${mpdapps[@]}"; do
-                                if in_array "$app" "${!applist[@]}"; then
-                                    unset applist[$app]
-                                fi
-                            done
-                        fi
-                    else
-                        applist[$opt]=
-                        if [[ $opt = "MPD" ]]; then
-                            mpd_cat
-                        fi
-                    fi
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat = 1 )) && quitcat=0 && break
-    done
-}
-
-mpd_cat() {
-    while true; do
-        print_title " > Install Applications > Music Players > MPD Clients\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${mpdapps[@]}"; do
-            desc="${mpddesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#mpdapps[@]}])
-                    opt=${mpdapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat = 1 )) && quitcat=0 && break
-    done
-}
-
-office_cat() {
-    while true; do
-        print_title " > Install Applications > Office Apps\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${officeapps[@]}"; do
-            desc="${officedesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-12s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#officeapps[@]}])
-                    opt=${officeapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat = 1 )) && quitcat=0 && break
-    done
-}
-
-pdf_cat() {
-    while true; do
-        print_title " > Install Applications > PDF Readers\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${pdfapps[@]}"; do
-            desc="${pdfdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-20s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#pdfapps[@]}])
-                    opt=${pdfapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat = 1 )) && quitcat=0 && break
-    done
-}
-
-rss_cat() {
-    while true; do
-        print_title " > Install Applications > RSS Readers\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${rssapps[@]}"; do
-            desc="${rssdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-11s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#rssapps[@]}])
-                    opt=${rssapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat = 1 )) && quitcat=0 && break
-    done
-}
-
-sysmon_cat() {
-    while true; do
-        print_title " > Install Applications > System Monitors\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${sysmonapps[@]}"; do
-            desc="${sysmondesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-6s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#sysmonapps[@]}])
-                    opt=${sysmonapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-term_cat() {
-    while true; do
-        print_title " > Install Applications > Terminal Emulators\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${termapps[@]}"; do
-            desc="${termdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-16s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#termapps[@]}])
-                    opt=${termapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-text_cat() {
-    while true; do
-        print_title " > Install Applications > Text Editors\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${textapps[@]}"; do
-            desc="${textdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-8s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#textapps[@]}])
-                    opt=${textapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-torrent_cat() {
-    while true; do
-        print_title " > Install Applications > Torrent Clients\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${torrentapps[@]}"; do
-            desc="${torrentdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-24s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#torrentapps[@]}])
-                    opt=${torrentapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-util_cat() {
-    while true; do
-        print_title " > Install Applications > Utilities\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${utilapps[@]}"; do
-            desc="${utildesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-11s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#utilapps[@]}])
-                    opt=${utilapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-video_cat() {
-    while true; do
-        print_title " > Install Applications > Video Players\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${videoapps[@]}"; do
-            desc="${videodesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-14s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#videoapps[@]}])
-                    opt=${videoapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-web_cat() {
-    while true; do
-        print_title " > Install Applications > Web Browsers\n"
-        printf '%b\n' "Select the correct number to either enable or disable a selection. Applications\nthat were already marked with a * are pre-installed applications, you can\nremove them if you like by disabling them. Applications marked with * will be\ninstalled.\n\n0.   Proceed to next step\n"
-        idx=1
-        for app in "${webapps[@]}"; do
-            desc="${webdesc["$app"]}"
-            in_array "$app" "${!applist[@]}" && contains="*"
-            echo "${idx}. ${contains:- } $(printf "%-12s|" "$app") ${desc}"
-            (( idx++ )) && contains=""
-        done
-        echo
-        while true; do
-            read -s -n 1 -p "> " REPLY
-            case "$REPLY" in
-                0)  quitcat=1; clear; break
-                    ;;
-                [1-${#webapps[@]}])
-                    opt=${webapps[$REPLY-1]}
-                    if in_array "$opt" "${!applist[@]}"; then
-                        unset applist[$opt]
-                    else
-                        applist[$opt]=
-                    fi
-                    clear
-                    break
-                    ;;
-                *)  echo "Invalid Option"
-                    ;;
-            esac
-        done
-        (( quitcat == 1 )) && quitcat=0 && break
-    done
-}
-
-
-
-# OPTION REMOVE ################################################################
-
-
-removefromstartup(){
-    if grep -q "postinstall" "$HOME"/.xinitrc; then
-        sed -i '/postinstall/d' "$HOME"/.xinitrc
+remove_from_startup(){
+    if grep -q "postinstall" "$HOME/.xinitrc"; then
+        sed -i '/postinstall/d' "$HOME/.xinitrc"
         echo "Post Installation Script won't be shown after booting again."
     else
         echo "Post Installation Script was already removed from the start-up list."
     fi
 }
 
-
-
-# OPTION QUIT ##################################################################
-
-
 quit() {
     while true; do
         read -s -n 1 -p "Are you sure you want to quit? [y/N] " yesno
         if [[ $yesno = [Yy] ]]; then
-            printf '%b\n' "\nThank you for installing!\nIf you'd want to run this script again later on, you can type 'postinstall' in your terminal.\nQuitting..."
+            printf '%b\n' "\n\nThank you for installing!\n"\
+                          "If you'd want to run this script again later on, you can type 'postinstall' in"\
+                          "your terminal.\n"\
+                          "Quitting..."
             exit 0
         else
             echo
@@ -1747,9 +463,36 @@ quit() {
     done
 }
 
+clear
+print_title
+print_main
+printf '%b\n' "\nIt is necessary for this script that an internet conncetion is available. Please"\
+              "make sure that you have a working connection before you continue. Press [Return]"\
+              "to perform a connection check.\n"
 
+declare -A work_list installed_list
+pacman_query="$(pacman -Qq)"
+for app in "${!apps_descr[@]}"; do
+    if echo "$pacman_query" | grep -q "^${app,,}$"; then
+        work_list[$app]="*"
+        installed_list[$app]=
+    fi
+done
 
-# WELCOME ######################################################################
-
-
-welcome
+while true; do
+    read -s -n 1 -p "$PS3" input
+    if [[ $input = "" ]]; then
+        if ping -q -w 1 -c 1 8.8.8.8 &> /dev/null; then
+            echo "Connection check succeeded..."
+            sleep 1
+            main
+        else
+            printf '%s\n' "Connection check failed... Please connect to the internet and press [Return] to"\
+                          "run a connection check again"
+            continue
+        fi
+    else
+        echo "Press [Return] to run a connection check"
+        continue
+    fi
+done
