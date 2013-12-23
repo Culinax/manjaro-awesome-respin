@@ -9,7 +9,12 @@
 #
 # Written by Culinax
 
-source "${0%/*}/postinstall-data.sh"
+if [[ ! -f "${0%/*}/postinstall-data.sh" ]]; then
+    echo "Cannot find postinstall-data.sh, quiting..." >&2
+    exit 1
+else
+    source "${0%/*}/postinstall-data.sh"
+fi
 
 PS3="> "
 
