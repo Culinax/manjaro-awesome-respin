@@ -162,11 +162,11 @@ vol:buttons(awful.util.table.join(
         vol.update()
     end),
     awful.button({}, 4, function ()
-        awful.util.spawn(awful.util.getdir("config") .. "/scripts/volume.sh up 2")
+        awful.util.spawn(awful.util.getdir("config") .. "/scripts/volume.sh up")
         vol.update()
     end),
     awful.button({}, 5, function ()
-        awful.util.spawn(awful.util.getdir("config") .. "/scripts/volume.sh down 2")
+        awful.util.spawn(awful.util.getdir("config") .. "/scripts/volume.sh down")
         vol.update()
     end)
 ))
@@ -375,20 +375,20 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "s", function () awful.layout.set(awful.layout.suit.fair) end),
     awful.key({ modkey, "Control" }, "m", function () awful.layout.set(awful.layout.suit.max) end),
 
-    -- Volume control (Script which uses 'volnoti' as notification) SYNTAX: up/down/mute | percentage
+    -- Volume control (Script which uses 'volnoti' as notification)
     awful.key({ }, "XF86AudioRaiseVolume", function ()
-        awful.util.spawn(awful.util.getdir("config") .. "/scripts/volume.sh up 2")
+        awful.util.spawn(awful.util.getdir("config") .. "/scripts/volume.sh up")
         vol.update() end),
     awful.key({ }, "XF86AudioLowerVolume", function ()
-        awful.util.spawn(awful.util.getdir("config") .. "/scripts/volume.sh down 2")
+        awful.util.spawn(awful.util.getdir("config") .. "/scripts/volume.sh down")
         vol.update() end),
     awful.key({ }, "XF86AudioMute",        function ()
         awful.util.spawn(awful.util.getdir("config") .. "/scripts/volume.sh mute")
         vol.update() end),
 
     -- Brightness control (Script which uses 'volnoti' as notification) SYNTAX: up/down | percentage
-    awful.key({ }, "XF86MonBrightnessUp",   function () awful.util.spawn_with_shell(awful.util.getdir("config") .. "/scripts/brightness.sh up 10") end),
-    awful.key({ }, "XF86MonBrightnessDown", function () awful.util.spawn_with_shell(awful.util.getdir("config") .. "/scripts/brightness.sh down 10") end),
+    awful.key({ }, "XF86MonBrightnessUp",   function () awful.util.spawn_with_shell(awful.util.getdir("config") .. "/scripts/brightness.sh up") end),
+    awful.key({ }, "XF86MonBrightnessDown", function () awful.util.spawn_with_shell(awful.util.getdir("config") .. "/scripts/brightness.sh down") end),
 
     -- Screen lock
     awful.key({ modkey, "Shift" }, "l", function () awful.util.spawn_with_shell("slimlock") end),
