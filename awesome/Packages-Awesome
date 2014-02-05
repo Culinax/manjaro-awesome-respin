@@ -39,7 +39,7 @@ awesome-freedesktop # Local repo (GitHub: https://github.com/almonteb/awesome-fr
 oblogout
 slim
 dmenu-xft-height # Local repo (AUR)
-unagi # Local repo (AUR)
+compton
 volnoti-git # Local repo (GitHub: https://github.com/hcchu/volnoti)
 zsh
 infinality-bundle # Custom repo (infinality-bundle)
