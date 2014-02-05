@@ -49,6 +49,7 @@ postinstall # Local repo (Own package)
 conky
 network-manager-applet
 clipit
+lxpolkit
 
 ## Applications
 spacefm
