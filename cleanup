@@ -1,7 +1,7 @@
 #!/bin/bash
 
 case "$1" in
-    -a | --all)     sudo rm -r $HOME/Documents/manjaro-awesome-respin/awesome/work*; sudo rm $HOME/Documents/manjaro-awesome-respin/awesome/*.iso; sudo rm $HOME/Documents/manjaro-awesome-respin/awesome/*-pkgs.txt ;;
-    -w | --work)    sudo rm -r $HOME/Documents/manjaro-awesome-respin/awesome/work* ;;
-    -i | --iso)     sudo rm $HOME/Documents/manjaro-awesome-respin/awesome/*.iso; sudo rm $HOME/Documents/manjaro-awesome-respin/awesome/*-pkgs.txt ;;
+    -a | --all)     find . -maxdepth 1 \( -name "work*" -o -name "*.iso" -o -name "*-pkgs.txt" \) -exec sudo rm -r {} + ;;
+    -w | --work)    find . -maxdepth 1 -name "work*" -exec sudo rm -r {} + ;;
+    -i | --iso)     find . -maxdepth 1 \( -name "*.iso" -o -name "*-pkgs.txt" \) -exec rm {} + ;;
 esac
