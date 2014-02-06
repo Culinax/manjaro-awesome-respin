@@ -50,6 +50,7 @@ conky
 network-manager-applet
 clipit
 lxpolkit
+dex
 
 ## Applications
 spacefm

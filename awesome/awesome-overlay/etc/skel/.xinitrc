@@ -24,7 +24,7 @@ sleep 1 && compton -b
 # Applications
 (sleep 2 && volumeicon) &
 (sleep 2 && clipit) &
-(sleep 4 && nm-applet) &
+sleep 4 && dex -ae Awesome
 (sleep 4 && urxvt -e postinstall) &
 
 # Window Manager
