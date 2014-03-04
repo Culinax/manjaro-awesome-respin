@@ -138,7 +138,7 @@ mem = wibox.widget.textbox()
 vicious.register(mem, vicious.widgets.mem, '<span color="' .. blue .. '">RAM:</span> $1% ($2MB)', 5)
 
 thermal  = wibox.widget.textbox()
-vicious.register(thermal, vicious.widgets.thermal, '<span color="' .. blue .. '">Temp:</span> $1°C', 30, { "coretemp.0", "core"}) 
+vicious.register(thermal, vicious.widgets.thermal, '<span color="' .. blue .. '">Temp:</span> $1°C', 30, "thermal_zone0")
 
 -- ALSA
 vol = lain.widgets.alsa({
