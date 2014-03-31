@@ -249,17 +249,17 @@ pacman-key --populate archlinux manjaro
 echo "
 [infinality-bundle]
 SigLevel = Never
-Server = http://ibn.net63.net/infinality-bundle/$arch" >> /etc/pacman.conf
+Server = http://bohoomil.com/repo/$arch" >> /etc/pacman.conf
 
 [[ $arch = "x86_64" ]] && echo "
 [infinality-bundle-multilib]
 SigLevel = Never
-Server = http://ibn.net63.net/infinality-bundle-multilib/$arch" >> /etc/pacman.conf
+Server = http://bohoomil.com/repo/multilib/$arch" >> /etc/pacman.conf
 
 echo "
 [infinality-bundle-fonts]
 SigLevel = Never
-Server = http://ibn.net63.net/infinality-bundle-fonts" >> /etc/pacman.conf
+Server = http://bohoomil.com/repo/fonts" >> /etc/pacman.conf
 
 # fix_ping_installation
 setcap cap_net_raw=ep /usr/bin/ping &> /dev/null

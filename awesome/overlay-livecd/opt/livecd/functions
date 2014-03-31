@@ -484,17 +484,17 @@ hd_config()
     echo "
 [infinality-bundle]
 SigLevel = Never
-Server = http://ibn.net63.net/infinality-bundle/$arch" >> ${DESTDIR}/etc/pacman.conf
+Server = http://bohoomil.com/repo/$arch" >> ${DESTDIR}/etc/pacman.conf
 
     [[ $arch = "x86_64" ]] && echo "
 [infinality-bundle-multilib]
 SigLevel = Never
-Server = http://ibn.net63.net/infinality-bundle-multilib/$arch" >> ${DESTDIR}/etc/pacman.conf
+Server = http://bohoomil.com/repo/multilib/$arch" >> ${DESTDIR}/etc/pacman.conf
 
     echo "
 [infinality-bundle-fonts]
 SigLevel = Never
-Server = http://ibn.net63.net/infinality-bundle-fonts" >> ${DESTDIR}/etc/pacman.conf
+Server = http://bohoomil.com/repo/fonts" >> ${DESTDIR}/etc/pacman.conf
 
     # use testing repositories
     sed -i 's/^\(Branch=\).*/\1testing/' ${DESTDIR}/etc/pacman-mirrors.conf
