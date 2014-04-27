@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# ~/.xprofile
+
+# Daemons
+sleep 1 && compton -b
+(sleep 1 && volnoti) &
+(sleep 2 && spacefm -d) &
+(sleep 3 && udevil) &
+(sleep 3 && conky) &
+
+# Applications
+(sleep 2 && volumeicon) &
+(sleep 2 && clipit) &
+sleep 4 && dex -ae Awesome
+(sleep 4 && urxvt -e postinstall) &

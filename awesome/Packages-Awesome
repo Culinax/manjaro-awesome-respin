@@ -37,7 +37,7 @@ vicious
 lain # Local repo (AUR)
 awesome-freedesktop # Local repo (GitHub: https://github.com/almonteb/awesome-freedesktop)
 oblogout
-slim
+lightdm-gtk3-greeter
 dmenu-xft-height # Local repo (AUR)
 compton
 volnoti-git # Local repo (GitHub: https://github.com/hcchu/volnoti)

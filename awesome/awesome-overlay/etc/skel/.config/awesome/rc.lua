@@ -391,7 +391,7 @@ globalkeys = awful.util.table.join(
     awful.key({ }, "XF86MonBrightnessDown", function () awful.util.spawn_with_shell(awful.util.getdir("config") .. "/scripts/brightness.sh down") end),
 
     -- Screen lock
-    awful.key({ modkey, "Shift" }, "l", function () awful.util.spawn_with_shell("slimlock") end),
+    awful.key({ modkey, "Shift" }, "l", function () awful.util.spawn_with_shell("dm-tool lock") end),
 
     -- Screenshot
     awful.key({ }, "Print", function () awful.util.spawn_with_shell("scrot -e 'mv $f $HOME/Pictures/'") end),
