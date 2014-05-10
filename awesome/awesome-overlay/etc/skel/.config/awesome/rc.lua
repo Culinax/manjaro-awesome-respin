@@ -107,6 +107,7 @@ menu_items = freedesktop.menu.new()
 myawesomemenu = {
    { "manual", terminal .. " -e man awesome", freedesktop.utils.lookup_icon({ icon = 'help' }) },
    { "edit config", editor_cmd .. " " .. awful.util.getdir("config") .. "/rc.lua", freedesktop.utils.lookup_icon({ icon = 'package_settings' }) },
+   { "edit theme", editor_cmd .. " " .. awful.util.getdir("config") .. "/themes/cesious/theme.lua", freedesktop.utils.lookup_icon({ icon = 'package_settings' }) },
    { "restart", awesome.restart, freedesktop.utils.lookup_icon({ icon = 'gtk-refresh' }) },
    { "quit", "oblogout", freedesktop.utils.lookup_icon({ icon = 'gtk-quit' }) }
 }
@@ -394,8 +395,8 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift" }, "l", function () awful.util.spawn_with_shell("dm-tool lock") end),
 
     -- Screenshot
-    awful.key({ }, "Print", function () awful.util.spawn_with_shell("scrot -e 'mv $f $HOME/Pictures/'") end),
-    awful.key({ "Shift" }, "Print", function () awful.util.spawn_with_shell("scrot -s -e 'mv $f $HOME/Pictures/'") end),
+    awful.key({ }, "Print", function () awful.util.spawn_with_shell("scrot -e 'mv $f ~/Pictures/'") end),
+    awful.key({ "Shift" }, "Print", function () awful.util.spawn_with_shell("scrot -s -e 'mv $f ~/Pictures/'") end),
 
     -- Applications
     awful.key({ modkey }, "d", function () awful.util.spawn_with_shell("dwb") end),
@@ -565,4 +566,29 @@ local oldspawn = awful.util.spawn
 awful.util.spawn = function (s)
     oldspawn(s, false)
 end
+-- }}}
+
+-- {{{ Run autostarting applications only once
+function autostart(cmd, delay)
+    delay = delay or 0
+    awful.util.spawn_with_shell("pgrep -u $USER -x -f '" .. cmd .. "' || ( sleep " .. delay .. " && " .. cmd .. " )")
+end
+
+-- Autostart applications. The extra argument is optional, it means how long to
+-- delay a command before starting it (in seconds).
+autostart("compton -b", 1)
+autostart("volnoti", 1)
+autostart("clipit", 2)
+autostart("spacefm -d", 2)
+autostart("conky", 3)
+-- }}}
+
+-- {{{ Run .desktop files with dex
+-- Because 'dex' is not an application, run_once("dex -ae Awesome") will always
+-- execute every entry (which is unwanted).
+local dex_output = io.popen("dex -ade Awesome")
+for cmd in dex_output:lines() do
+    autostart(cmd:gsub("Executing command: ", ""), 4)
+end
+dex_output:close()
 -- }}}
