@@ -27,7 +27,7 @@ manjaro-alsa
 
 ## Artwork
 manjaro-artwork
-adwaita-manjaro-themes
+numix-themes-archblue # Local repo (AUR)
 xcursor-vanilla-dmz-aa
 faenza-cupertino-icon-theme # Local repo (AUR)
 
