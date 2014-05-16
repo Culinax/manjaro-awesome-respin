@@ -34,7 +34,7 @@ faenza-cupertino-icon-theme # Local repo (AUR)
 ## Base Packages
 awesome
 vicious
-lain # Local repo (AUR)
+lain-git # Local repo (AUR)
 awesome-freedesktop # Local repo (GitHub: https://github.com/almonteb/awesome-freedesktop)
 oblogout
 lightdm-gtk3-greeter
@@ -45,6 +45,7 @@ zsh
 infinality-bundle # Custom repo (infinality-bundle)
 >x86_64 infinality-bundle-multilib # Custom repo (infinality-bundle-multilib)
 ibfonts-meta-base # Custom repo (infinality-bundle-fonts)
+thus
 postinstall # Local repo (Own package)
 conky
 network-manager-applet

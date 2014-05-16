@@ -1,6 +1,0 @@
-#!/bin/sh
-#
-# ~/.xprofile
-
-# Applications
-(sleep 4 && urxvt -e postinstall) &

@@ -584,7 +584,7 @@ autostart("conky", 3)
 -- }}}
 
 -- {{{ Run .desktop files with dex
--- Because 'dex' is not an application, run_once("dex -ae Awesome") will always
+-- Because 'dex' is not an application, autostart("dex -ae Awesome") will always
 -- execute every entry (which is unwanted).
 local dex_output = io.popen("dex -ade Awesome")
 for cmd in dex_output:lines() do

@@ -480,25 +480,6 @@ hd_config()
     chroot ${DESTDIR} alsactl -f /etc/asound.state store &>/dev/null
 
     DIALOG --infobox "${_syncpacmandb}" 0 0
-    # append infinality repositories
-    echo "
-[infinality-bundle]
-SigLevel = Never
-Server = http://bohoomil.com/repo/$arch" >> ${DESTDIR}/etc/pacman.conf
-
-    [[ $arch = "x86_64" ]] && echo "
-[infinality-bundle-multilib]
-SigLevel = Never
-Server = http://bohoomil.com/repo/multilib/$arch" >> ${DESTDIR}/etc/pacman.conf
-
-    echo "
-[infinality-bundle-fonts]
-SigLevel = Never
-Server = http://bohoomil.com/repo/fonts" >> ${DESTDIR}/etc/pacman.conf
-
-    # use testing repositories
-    sed -i 's/^\(Branch=\).*/\1testing/' ${DESTDIR}/etc/pacman-mirrors.conf
-
     # enable default mirror
     cp -f ${DESTDIR}/etc/pacman.d/mirrorlist ${DESTDIR}/etc/pacman.d/mirrorlist.backup
     if [ ! -z "$ping_check" ] ; then
@@ -1100,7 +1081,7 @@ _setup_user()
        REPLY="$(cat ${ANSWER})"
     done
 
-    chroot ${DESTDIR} useradd -m -p "" -s "/usr/bin/zsh" -g users -G $addgroups $REPLY
+    chroot ${DESTDIR} useradd -m -p "" -g users -G $addgroups $REPLY
 
     PASSWDUSER="$REPLY"
 

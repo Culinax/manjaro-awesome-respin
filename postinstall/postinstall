@@ -210,6 +210,7 @@ main() {
                       "3. Rank mirrorlist, verifying keyrings, sync to the repositories and update"\
                       "4. Install drivers"\
                       "5. Install applications sorted by category"\
+                      "6. Configuration"\
                       "r. Never display at boot again"\
                       "q. Quit\n"
         while true; do
@@ -241,6 +242,11 @@ main() {
                     ;;
                 5)  clear
                     install_apps
+                    clear
+                    break
+                    ;;
+                6)  clear
+                    configuration
                     clear
                     break
                     ;;
@@ -436,26 +442,155 @@ install_apps() {
     process_selections "$subtitle"
 }
 
-remove_from_startup(){
-    if grep -q "postinstall" "$HOME/.xinitrc"; then
-        sed -i '/postinstall/d' "$HOME/.xinitrc"
-        echo "Post Installation Script won't be shown after booting again."
-    else
-        echo "Post Installation Script was already removed from the start-up list."
-    fi
+configuration() {
+    while true; do
+        print_title " > Configuration"
+        printf '%b\n' "Select the correct number of the configuration you want to perform.\n"\
+                      "1. Use Zsh as default terminal"\
+                      "2. Symlink local files to /root/"\
+                      "q. Quit\n"
+        while true; do
+            read -s -n 1 -p "$PS3" REPLY
+            case "$REPLY" in
+                1)  clear
+                    zsh_default_shell
+                    clear
+                    break
+                    ;;
+                2)  clear
+                    symlink_files
+                    clear
+                    break
+                    ;;
+                q)  quitcat=1
+                    clear
+                    break
+                    ;;
+                *)  echo "Invalid Option"
+                    continue
+                    ;;
+            esac
+        done
+        (( quitcat == 1 )) && quitcat=0 && break
+    done
+}
+
+zsh_default_shell() {
+    print_title " > Configuration > Zsh Default Shell"
+    while true; do
+        read -s -n 1 -p "Change shell from bash to zsh for $USER? [y/N] " yesno
+        echo
+        if [[ $yesno = [Yy] ]]; then
+            chsh -s /usr/bin/zsh
+            break
+        elif [[ $yesno = [Nn] ]]; then
+            break
+        else
+            continue
+        fi
+    done
+    while true; do
+        echo
+        read -s -n 1 -p "Change shell from bash to zsh for root? [y/N] " yesno
+        echo
+        if [[ $yesno = [Yy] ]]; then
+            sudo chsh -s /usr/bin/zsh
+            break
+        elif [[ $yesno = [Nn] ]]; then
+            break
+        else
+            continue
+        fi
+    done
+
+    printf '\n%s\n\n' "Changing shells has been finished. Press [Return] to finish."
+    while true; do
+        read -s -n 1 -p "$PS3" input
+        if [[ $input = "" ]]; then
+            break
+        else
+            echo "Press [Return] to finish"
+            continue
+        fi
+    done
+}
+
+symlink_files() {
+    fileslct() {
+        declare -Ag config_list
+        while true; do
+            local idx=1
+            print_title " > Configuration > Symlink Files"
+            printf '%s\n' "When you symlink local configuration files to /root/, then you'll have the same"\
+                      "configuration available for user and root. This way you can have the same"\
+                      "terminal configuration (using the same aliases, etc.), the same GTK theme, etc."
+            printf '\n%s\n\n' "0.    Proceed to next step"
+            for app in "$@"; do
+                printf "%-$((${##}+1))s %s %s\n" "${idx}." "${config_list[${app}]:- }" "$app"
+                ((idx++))
+            done
+            echo
+            while true; do
+                read -e -n ${##} -p "$PS3" REPLY
+
+                if [[ $REPLY != [0-9]* ]]; then
+                    echo "Invalid option"
+                    continue
+                elif (( 10#$REPLY == 0 )); then
+                    local quitslct=1
+                    break
+                elif (( 10#$REPLY >= 1 && 10#$REPLY <= $# )); then
+                    opt=${!REPLY}
+                    if in_array "${opt}" "${!config_list[@]}"; then
+                        unset config_list[${opt}]
+                    else
+                        config_list[${opt}]="*"
+                    fi
+                    clear
+                    break
+                else
+                    echo "Invalid option"
+                    continue
+                fi
+            done
+            (( quitslct == 1 )) && local quitslct=0 && break
+        done
+    }
+
+    fileslct "${local_configs[@]}"
+    for file in "${!config_list[@]}"; do
+        sudo ln -sf "$HOME/$file" "/root/$file"
+    done
+
+    printf '\n%s\n\n' "Files are symlinked. Press [Return] to finish."
+    while true; do
+        read -s -n 1 -p "$PS3" input
+        if [[ $input = "" ]]; then
+            break
+        else
+            echo "Press [Return] to finish"
+            continue
+        fi
+    done
+}
+
+remove_from_startup() {
+    for file in "$HOME/.local/share/applications/postinstall.desktop"\
+                "$HOME/.config/autostart/postinstall.desktop"; do
+        [[ -f $file ]] && rm "$file"
+    done
+    echo "Post Installation Script will now no longer be auto-started."
 }
 
 quit() {
+    printf '%b\n' "\nThank you for installing! If you'd want to run this script again in the future,"\
+                  "you can type 'postinstall' in your terminal."
     while true; do
-        read -s -n 1 -p "Are you sure you want to quit? [y/N] " yesno
-        if [[ $yesno = [Yy] ]]; then
-            printf '%b\n' "\n\nThank you for installing!\n"\
-                          "If you'd want to run this script again later on, you can type 'postinstall' in"\
-                          "your terminal.\n"\
-                          "Quitting..."
+        read -s -n 1 -p "Press [Return] to quit"$'\n' input
+        if [[ $input = "" ]]; then
             exit 0
         else
-            echo
+            printf '\n%s\n\n' "Quitting has been canceled"
             break
         fi
     done
@@ -514,6 +649,8 @@ documentation() {
 	        Take a screenshot of a windows (scrot)
 	EOF
 }
+
+local_configs=(".gtkrc-2.0" ".config/gtk-3.0" ".zshrc" ".bashrc")
 
 apps_aur=("Autoconf" "Automake" "binutils" "Bison" "fakeroot" "flex" "GCC" "libtool" "m4" "Make" "patch" "yaourt")
 apps_cal=("calcurse" "Wyrd")
