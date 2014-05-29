@@ -108,7 +108,7 @@ process_selections() {
             if [[ $input = "" ]]; then
                 break
             else
-                echo "Press [Return] to finish"
+                echo "Press [Return] to finish."
                 continue
             fi
         done
@@ -135,7 +135,7 @@ process_selections() {
             if [[ $input = "" ]]; then
                 break
             else
-                echo "Press [Return] to finish"
+                echo "Press [Return] to finish."
                 continue
             fi
         done
@@ -163,7 +163,7 @@ install_check() {
                 if [[ $input = "" ]]; then
                     return 0
                 else
-                    echo "Press [Return] to finish"
+                    echo "Press [Return] to finish."
                     continue
                 fi
             done
@@ -178,7 +178,7 @@ install_check() {
                 if [[ $input = "" ]]; then
                     return 1
                 else
-                    echo "Press [Return] to finish"
+                    echo "Press [Return] to finish."
                     continue
                 fi
             done
@@ -197,7 +197,8 @@ print_main() {
                   "should help you to get you started using your brand new installation.\n"\
                   "It is by no means mandatory to run this script, however it is recommended to go"\
                   "throught this script once, as it is a very helpful addition. It is recommended"\
-                  "to start from the first step and then work your way down."
+                  "to start from the first step and then work your way down.\n"
+
 }
 
 main() {
@@ -205,7 +206,11 @@ main() {
         clear
         print_title
         print_main
-        printf '%b\n' "\n1. Quick Awesome WM starting guide (description + mouse/keybindings)"\
+        printf '%b\n' "Extra documentation can be found by following these links:"\
+                      "- Manjaro Awesome WM Respin forum: https://forum.manjaro.org/index.php?topic=7315.0"\
+                      "- Official Awesome WM Wiki: http://awesome.naquadah.org/wiki/Main_Page"\
+                      "- Awesome WM on the Arch Wiki: https://wiki.archlinux.org/index.php/awesome\n"
+        printf '%b\n' "1. Quick Awesome WM starting guide (description + mouse/keybindings)"\
                       "2. Manjaro specific keybindings"\
                       "3. Rank mirrorlist, verifying keyrings, sync to the repositories and update"\
                       "4. Install drivers"\
@@ -221,7 +226,7 @@ main() {
                     break
                     ;;
                 2)  clear
-                    documentation | less
+                    keybinds | less
                     clear
                     break
                     ;;
@@ -509,7 +514,7 @@ zsh_default_shell() {
         if [[ $input = "" ]]; then
             break
         else
-            echo "Press [Return] to finish"
+            echo "Press [Return] to finish."
             continue
         fi
     done
@@ -562,13 +567,13 @@ symlink_files() {
         sudo ln -sf "$HOME/$file" "/root/$file"
     done
 
-    printf '\n%s\n\n' "Files are symlinked. Press [Return] to finish."
+    printf '\n%s\n\n' "The selected files are symlinked. Press [Return] to finish."
     while true; do
         read -s -n 1 -p "$PS3" input
         if [[ $input = "" ]]; then
             break
         else
-            echo "Press [Return] to finish"
+            echo "Press [Return] to finish."
             continue
         fi
     done
@@ -586,7 +591,7 @@ quit() {
     printf '%b\n' "\nThank you for installing! If you'd want to run this script again in the future,"\
                   "you can type 'postinstall' in your terminal."
     while true; do
-        read -s -n 1 -p "Press [Return] to quit"$'\n' input
+        read -s -n 1 -p "Press [Return] to quit."$'\n' input
         if [[ $input = "" ]]; then
             exit 0
         else
@@ -596,7 +601,7 @@ quit() {
     done
 }
 
-documentation() {
+keybinds() {
 	cat <<-EOF
 	List of added (non-default) keybindings. For default keybindings you can read the manpage of awesome.
 	
@@ -827,7 +832,7 @@ declare -A apps_descr=(
 clear
 print_title
 print_main
-printf '%b\n' "\nIt is necessary for this script that an internet conncetion is available. Please"\
+printf '%b\n' "It is necessary for this script that an internet conncetion is available. Please"\
               "make sure that you have a working connection before you continue. Press [Return]"\
               "to perform a connection check.\n"
 
@@ -849,11 +854,11 @@ while true; do
             main
         else
             printf '%s\n' "Connection check failed... Please connect to the internet and press [Return] to"\
-                          "run a connection check again"
+                          "run a connection check again."
             continue
         fi
     else
-        echo "Press [Return] to run a connection check"
+        echo "Press [Return] to run a connection check."
         continue
     fi
 done
