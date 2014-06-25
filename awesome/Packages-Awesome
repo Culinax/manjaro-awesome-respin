@@ -1,7 +1,6 @@
 ## Xorg Packages
 inxi
 libdnet
-mesa
 mesa-demos
 >x86_64 lib32-mesa-demos
 netkit-bsd-finger
@@ -21,6 +20,12 @@ xorg-server-utils
 xorg-twm
 xorg-utils
 xorg-xinit
+
+## Network
+netctl
+networkmanager
+networkmanager-dispatcher-ntpd
+openresolv
 
 ## Packages for Sound and Audio
 manjaro-alsa

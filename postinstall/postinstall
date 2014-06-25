@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# postinstall-0.3.1  -  Post Installation Script
+# postinstall-0.3.2  -  Post Installation Script
 #
 # Post Installation Script is a script which is developed for Manjaro Awesome
 # WM Respin, codenamed: Cesious. It's purpose is to provide an easy way for

@@ -61,8 +61,8 @@ fi
 
 ## FIXME - Workaround to launch mate-terminal
 if [ -e "/usr/bin/mate-session" ] ; then
-   sed -i -e "s~^.*Exec=.*~Exec=mate-terminal -e 'sudo setup'~" "/etc/skel/Desktop/Manjaro CLI Installer.desktop"
-   sed -i -e "s~^.*Terminal=.*~Terminal=false~" "/etc/skel/Desktop/Manjaro CLI Installer.desktop"
+   sed -i -e "s~^.*Exec=.*~Exec=mate-terminal -e 'sudo setup'~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
+   sed -i -e "s~^.*Terminal=.*~Terminal=false~" "/etc/skel/Desktop/installer-launcher-cli.desktop"
 fi
 
 echo "configure user" >> /tmp/livecd.log
@@ -102,6 +102,9 @@ if [ -e "/usr/bin/lightdm" ] ; then
    fi
    if [ -e "/usr/bin/lxsession" ] ; then
         sed -i -e 's/^.*user-session=.*/user-session=LXDE/' /etc/lightdm/lightdm.conf
+   fi
+   if [ -e "/usr/bin/awesome" ] ; then
+        sed -i -e 's/^.*user-session=.*/user-session=awesome/' /etc/lightdm/lightdm.conf
    fi
    sed -i -e "s/^.*autologin-user=.*/autologin-user=${username}/" /etc/lightdm/lightdm.conf
    sed -i -e 's/^.*autologin-user-timeout=.*/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
@@ -153,6 +156,9 @@ if [ -e "/usr/bin/gdm" ] ; then
      if [ -e "/usr/bin/lxsession" ] ; then
         echo "XSession=LXDE" >> /var/lib/AccountsService/users/gdm
      fi
+     if [ -e "/usr/bin/awesome" ] ; then
+        echo "XSession=awesome" >> /var/lib/AccountsService/users/gdm
+     fi
      echo "Icon=" >> /var/lib/AccountsService/users/gdm
   fi
 fi
@@ -182,6 +188,9 @@ if [ -e "/usr/bin/mdm" ] ; then
   if [ -e "/usr/bin/enlightenment_start" ] ; then
       sed -i 's|default.desktop|enlightenment.desktop|g' /etc/mdm/custom.conf
   fi
+  if [ -e "/usr/bin/awesome" ] ; then
+      sed -i 's|default.desktop|awesome.desktop|g' /etc/mdm/custom.conf
+  fi
 fi
 
 # do_setupsddm
@@ -205,6 +214,9 @@ if [ -e "/usr/bin/sddm" ] ; then
   fi
   if [ -e "/usr/bin/enlightenment_start" ] ; then
       sed -i -e 's|^.*LastSession=.*|LastSession=enlightenment.desktop|' /etc/sddm.conf
+  fi
+  if [ -e "/usr/bin/awesome" ] ; then
+      sed -i -e 's|^.*LastSession=.*|LastSession=awesome.desktop|' /etc/sddm.conf
   fi
 fi
 
@@ -231,6 +243,9 @@ if [ -e "/usr/bin/lxdm" ] ; then
    fi
    if [ -e "/usr/bin/lxsession" ] ; then
       sed -i -e 's|^.*session=.*|session=/usr/bin/lxsession|' /etc/lxdm/lxdm.conf
+   fi
+   if [ -e "/usr/bin/awesome" ] ; then
+      sed -i -e 's|^.*session=.*|session=/usr/bin/awesome|' /etc/lxdm/lxdm.conf
    fi
    chgrp -R lxdm /var/lib/lxdm > /dev/null
    chgrp lxdm /etc/lxdm/lxdm.conf > /dev/null
@@ -259,6 +274,9 @@ if [ -d "/var/lib/AccountsService/users" ] ; then
      if [ -e "/usr/bin/lxsession" ] ; then
         echo "XSession=LXDE" >> /var/lib/AccountsService/users/manjaro
      fi
+     if [ -e "/usr/bin/awesome" ] ; then
+        echo "XSession=awesome" >> /var/lib/AccountsService/users/manjaro
+     fi
      echo "Icon=/var/lib/AccountsService/icons/manjaro.png" >> /var/lib/AccountsService/users/manjaro
 fi
 
@@ -282,8 +300,8 @@ if [ -e "/usr/bin/gnome-keyring-daemon" ] ; then
 fi
 
 # configurate pacman
-#pacman-key --init
-#pacman-key --populate archlinux manjaro
+pacman-key --init
+pacman-key --populate archlinux manjaro
 
 # fix_ping_installation
 setcap cap_net_raw=ep /usr/bin/ping &> /dev/null
@@ -379,6 +397,10 @@ if [ -e "$_conf_file" ] ; then
    if [ -e "/bootmnt/${install_dir}/${arch}/awesome-image.sqfs" ] ; then
       sed -i "s|_desktop_|/bootmnt/${install_dir}/_ARCH_/awesome-image.sqfs|g" $_conf_file
       sed -i "s|_title_|Manjaro Awesome Edition|g" $_conf_file
+   fi
+   if [ -e "/bootmnt/${install_dir}/${arch}/custom-image.sqfs" ] ; then
+      sed -i "s|_desktop_|/bootmnt/${install_dir}/_ARCH_/custom-image.sqfs|g" $_conf_file
+      sed -i "s|_title_|Manjaro Custom Edition|g" $_conf_file
    fi
    if [ "${arch}" == "i686" ] ; then
       sed -i "s|_ARCH_|i686|g" $_conf_file
