@@ -75,6 +75,7 @@ zathura-pdf-poppler
 leafpad
 gvim
 sxiv
+sxiv-rifle # Local repo (AUR)
 weechat
 mutt
 newsbeuter
