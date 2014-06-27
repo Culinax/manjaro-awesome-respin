@@ -302,6 +302,7 @@ install_drivers() {
                       "2. Graphics driver"\
                       "3. Multimedia support"\
                       "4. Printer drivers"\
+                      "5. Alternative file systems"\
                       "q. Quit\n"
         while true; do
             read -s -n 1 -p "$PS3" REPLY
@@ -323,6 +324,11 @@ install_drivers() {
                     ;;
                 4)  clear
                     install_printer
+                    clear
+                    break
+                    ;;
+                5)  clear
+                    install_alt_fs
                     clear
                     break
                     ;;
@@ -399,6 +405,12 @@ install_printer() {
 
     systemctl enable cups
     systemctl start cups
+}
+
+install_alt_fs() {
+    local subtitle=" > Install Drivers > Alternative File Systems"
+    slct "$subtitle" "${apps_alt_fs[@]}"
+    process_selections "$subtitle"
 }
 
 install_apps() {
@@ -655,9 +667,12 @@ keybinds() {
 	EOF
 }
 
+
+IFS=. read -r major minor _ <<< "$(uname -r)"
 local_configs=(".gtkrc-2.0" ".config/gtk-3.0" ".zshrc" ".bashrc")
 
 apps_aur=("Autoconf" "Automake" "binutils" "Bison" "fakeroot" "flex" "GCC" "libtool" "m4" "Make" "patch" "yaourt")
+apps_alt_fs=("exfat-utils" "f2fs-tools" "fuse-exfat" "linux$major$minor-zfs" "manjarozfs")
 apps_cal=("calcurse" "Wyrd")
 apps_cddvd=("Brasero" "K3b" "Xfburn")
 apps_chat=("BitlBee" "Pidgin" "Skype")
@@ -714,6 +729,8 @@ declare -A apps_descr=(
     ["ePDFView"]="A free lightweight PDF document viewer."
     ["Evince"]="Simply a document viewer"
     ["Evolution"]="Manage your email, contacts and schedule"
+    ["exfat-utils"]="Utilities for exFAT file system"
+    ["f2fs-tools"]="Tools for Flash-Friendly File System (F2FS)"
     ["fakeroot"]="Gives a fake root environment, useful for building packages as a non-privileged user"
     ["feh"]="Fast and light imlib2-based image viewer"
     ["Firefox"]="Standalone web browser from mozilla.org"
@@ -722,6 +739,7 @@ declare -A apps_descr=(
     ["foomatic-db"]="Foomatic - The collected knowledge about printers, drivers, and driver options in XML files, used by foomatic-db-engine to generate PPD files."
     ["foomatic-db-engine"]="Foomatic - Foomatic's database engine generates PPD files from the data in Foomatic's XML database. It also contains scripts to directly generate print queues and handle jobs."
     ["foomatic-db-nonfree"]="Foomatic - database extension consisting of manufacturer-supplied PPD files released under non-free licenses"
+    ["fuse-exfat"]="Free exFAT file system implementation"
     ["galculator"]="GTK+ based scientific calculator"
     ["GCC"]="The GNU Compiler Collection - C and C++ frontends"
     ["Geany"]="Fast and lightweight IDE"
@@ -761,10 +779,12 @@ declare -A apps_descr=(
     ["libtool"]="A generic library support script"
     ["Liferea"]="A desktop news aggregator for online news feeds and weblogs"
     ["LilyTerm"]="A light and easy to use libvte based X terminal emulator"
+    ["linux$major$minor-zfs"]="Kernel modules for the Zettabyte File System."
     ["luakit"]="Fast, small, webkit based browser framework extensible by Lua"
     ["LXTerminal"]="VTE-based terminal emulator (part of LXDE)"
     ["m4"]="The GNU macro processor"
     ["Make"]="GNU make utility to maintain groups of programs"
+    ["manjarozfs"]="User-Mode utils and Kernel modules for Zettabyte File System."
     ["MC"]="Midnight Commander is a text based filemanager/shell that emulates Norton Commander"
     ["Midori"]="Lightweight web browser based on Gtk WebKit"
     ["Mirage"]="A simple GTK+ Image Viewer"
