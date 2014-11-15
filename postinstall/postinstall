@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# postinstall-0.3.2  -  Post Installation Script
+# postinstall-0.3.3  -  Post Installation Script
 #
 # Post Installation Script is a script which is developed for Manjaro Awesome
 # WM Respin, codenamed: Cesious. It's purpose is to provide an easy way for
@@ -298,36 +298,30 @@ install_drivers() {
     while true; do
         print_title " > Install Drivers"
         printf '%b\n' "Select the correct number of the driver you want to install.\n"\
-                      "1. AUR support"\
-                      "2. Graphics driver"\
-                      "3. Multimedia support"\
-                      "4. Printer drivers"\
-                      "5. Alternative file systems"\
+                      "1. Graphics driver"\
+                      "2. Multimedia support"\
+                      "3. Printer drivers"\
+                      "4. Alternative file systems"\
                       "q. Quit\n"
         while true; do
             read -s -n 1 -p "$PS3" REPLY
             case "$REPLY" in
                 1)  clear
-                    install_aur
-                    clear
-                    break
-                    ;;
-                2)  clear
                     install_graphics
                     clear
                     break
                     ;;
-                3)  clear
+                2)  clear
                     install_media
                     clear
                     break
                     ;;
-                4)  clear
+                3)  clear
                     install_printer
                     clear
                     break
                     ;;
-                5)  clear
+                4)  clear
                     install_alt_fs
                     clear
                     break
@@ -343,16 +337,6 @@ install_drivers() {
         done
         (( quitcat == 1 )) && quitcat=0 && break
     done
-}
-
-install_aur() {
-    for app in "${apps_aur[@]}"; do
-        work_list[$app]="*"
-    done
-
-    local subtitle=" > Install Drivers > AUR Support"
-    slct "$subtitle" "${apps_aur[@]}"
-    process_selections "$subtitle"
 }
 
 install_graphics() {
@@ -389,7 +373,7 @@ install_media() {
         work_list[$app]="*"
     done
 
-    local subtitle=" > Install Drivers > AUR Support"
+    local subtitle=" > Install Drivers > Media Support"
     slct "$subtitle" "${apps_media[@]}"
     process_selections "$subtitle"
 }
@@ -671,7 +655,6 @@ keybinds() {
 IFS=. read -r major minor _ <<< "$(uname -r)"
 local_configs=(".gtkrc-2.0" ".config/gtk-3.0" ".zshrc" ".bashrc")
 
-apps_aur=("Autoconf" "Automake" "binutils" "Bison" "fakeroot" "flex" "GCC" "libtool" "m4" "Make" "patch" "yaourt")
 apps_alt_fs=("exfat-utils" "f2fs-tools" "fuse-exfat" "linux$major$minor-zfs" "manjarozfs")
 apps_cal=("calcurse" "Wyrd")
 apps_cddvd=("Brasero" "K3b" "Xfburn")
@@ -704,11 +687,7 @@ declare -A apps_descr=(
     ["AbiWord"]="A fully-featured word processor"
     ["Amarok"]="The powerful music player for KDE"
     ["Audacious"]="Lightweight, advanced audio player focused on audio quality"
-    ["Autoconf"]="A GNU tool for automatically configuring source code"
-    ["Automake"]="A GNU tool for automatically creating Makefiles"
     ["Banshee"]="Music management and playback for GNOME"
-    ["binutils"]="A set of programs to assemble and manipulate binary and object files"
-    ["Bison"]="The GNU general-purpose parser generator"
     ["BitlBee"]="Brings instant messaging (XMPP, MSN, Yahoo!, AIM, ICQ, Twitter to IRC)"
     ["BleachBit"]="Deletes unneeded files to free disk space and maintain privacy"
     ["Blender"]="A fully integrated 3D graphics creation suite"
@@ -731,17 +710,14 @@ declare -A apps_descr=(
     ["Evolution"]="Manage your email, contacts and schedule"
     ["exfat-utils"]="Utilities for exFAT file system"
     ["f2fs-tools"]="Tools for Flash-Friendly File System (F2FS)"
-    ["fakeroot"]="Gives a fake root environment, useful for building packages as a non-privileged user"
     ["feh"]="Fast and light imlib2-based image viewer"
     ["Firefox"]="Standalone web browser from mozilla.org"
     ["FlashPlugin"]="Adobe Flash Player"
-    ["flex"]="A tool for generating text-scanning program"
     ["foomatic-db"]="Foomatic - The collected knowledge about printers, drivers, and driver options in XML files, used by foomatic-db-engine to generate PPD files."
     ["foomatic-db-engine"]="Foomatic - Foomatic's database engine generates PPD files from the data in Foomatic's XML database. It also contains scripts to directly generate print queues and handle jobs."
     ["foomatic-db-nonfree"]="Foomatic - database extension consisting of manufacturer-supplied PPD files released under non-free licenses"
     ["fuse-exfat"]="Free exFAT file system implementation"
     ["galculator"]="GTK+ based scientific calculator"
-    ["GCC"]="The GNU Compiler Collection - C and C++ frontends"
     ["Geany"]="Fast and lightweight IDE"
     ["gedit"]="A text editor for GNOME"
     ["Ghostscript"]="An interpreter for the PostScript language"
@@ -776,14 +752,11 @@ declare -A apps_descr=(
     ["Leafpad"]="A notepad clone for GTK+ 2.0"
     ["libdvdcss"]="Portable abstraction library for DVD decryption"
     ["LibreOffice"]="A productivity suite that is compatible with other major office suites"
-    ["libtool"]="A generic library support script"
     ["Liferea"]="A desktop news aggregator for online news feeds and weblogs"
     ["LilyTerm"]="A light and easy to use libvte based X terminal emulator"
     ["linux$major$minor-zfs"]="Kernel modules for the Zettabyte File System."
     ["luakit"]="Fast, small, webkit based browser framework extensible by Lua"
     ["LXTerminal"]="VTE-based terminal emulator (part of LXDE)"
-    ["m4"]="The GNU macro processor"
-    ["Make"]="GNU make utility to maintain groups of programs"
     ["manjarozfs"]="User-Mode utils and Kernel modules for Zettabyte File System."
     ["MC"]="Midnight Commander is a text based filemanager/shell that emulates Norton Commander"
     ["Midori"]="Lightweight web browser based on Gtk WebKit"
@@ -803,7 +776,6 @@ declare -A apps_descr=(
     ["newsbeuter"]="A RSS feed reader for the text console with special Podcast support"
     ["Opera"]="Fast and secure web browser and Internet suite"
     ["Parcellite"]="Lightweight GTK+ clipboard manager"
-    ["patch"]="A utility to apply patch files to original sources"
     ["PCManFM"]="An extremely fast and lightweight file manager"
     ["Pidgin"]="Multi-protocol instant messaging client"
     ["Pinta"]="A drawing/editing program modeled after Paint.NET."
@@ -844,7 +816,6 @@ declare -A apps_descr=(
     ["Xfce4-Terminal"]="A modern terminal emulator primarly for the Xfce desktop environment"
     ["Xpdf"]="Viewer for Portable Document Format (PDF files)"
     ["xterm"]="X Terminal Emulator"
-    ["yaourt"]="A pacman wrapper with extended features and AUR support"
     ["zathura-pdf-mupdf"]="Adds pdf support to zathura by using the mupdf library"
     ["zathura-pdf-poppler"]="Adds pdf support to zathura by using the poppler engine"
 )

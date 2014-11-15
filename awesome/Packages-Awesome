@@ -30,6 +30,21 @@ openresolv
 ## Packages for Sound and Audio
 manjaro-alsa
 
+## AUR Support
+autoconf
+automake
+binutils
+bison
+fakeroot
+flex
+>i686 gcc
+>x86_64 gcc-multilib
+libtool
+m4
+make
+patch
+yaourt
+
 ## Artwork
 manjaro-artwork
 numix-themes-archblue # Local repo (AUR)
