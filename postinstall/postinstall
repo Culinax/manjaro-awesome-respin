@@ -95,7 +95,7 @@ process_selections() {
     local installation=() removal=()
     for app in "${!work_list[@]}"; do
         if ! in_array "${app}" "${!installed_list[@]}"; then
-            installation+=("${app,,}")
+            installation+=("$app")
         fi
     done
 
@@ -113,7 +113,7 @@ process_selections() {
             fi
         done
     else
-        if install_check i sudo pacman -S "${installation[@]}"; then
+        if install_check i sudo pacman -S "${installation[@],,}"; then
             for app in "${installation[@]}"; do
                 installed_list[$app]=
             done
@@ -122,7 +122,7 @@ process_selections() {
 
     for app in "${!installed_list[@]}"; do
         if ! in_array "${app}" "${!work_list[@]}"; then
-            removal+=("${app,,}")
+            removal+=("$app")
         fi
     done
 
@@ -140,7 +140,7 @@ process_selections() {
             fi
         done
     else
-        if install_check r sudo pacman -Rns "${removal[@]}"; then
+        if install_check r sudo pacman -Rns "${removal[@],,}"; then
             for app in "${removal[@]}"; do
                 unset installed_list[$app]
             done
@@ -609,7 +609,7 @@ keybinds() {
 	    Mod4 + b
 	        Toggle wibox visibilaty
 	    Mod4 + Shift + l
-	        Lock the screen (slock)
+	        Lock the screen (LightDM)
 	
 	Applications
 	    Mod4 + d
